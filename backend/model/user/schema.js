@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt-nodejs');
+const autoIncrement = require('mongoose-auto-increment');
 
 var UserSchema = new Schema({
 	email: {
@@ -10,6 +11,10 @@ var UserSchema = new Schema({
 	},
 	password: {
 		type: String,
+		required: true
+	},
+	admin: {
+		type: Boolean,
 		required: true
 	}
 });
@@ -42,5 +47,7 @@ UserSchema.methods.comparePassword = function (passw, cb) {
         cb(null, isMatch);
     });
 };
+
+UserSchema.plugin(autoIncrement.plugin, 'User');
 
 module.exports = mongoose.model("User", UserSchema);

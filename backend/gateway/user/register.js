@@ -11,7 +11,8 @@ router.post("/account", (request, response, next) => {
 	} else {
 		var newUser = new User({
 			email: request.body.email,
-			password: request.body.password
+			password: request.body.password,
+			admin: false
 		});
 		// Save the user
 		newUser.save((error) => {

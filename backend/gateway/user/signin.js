@@ -11,7 +11,7 @@ router.post("/account", (request, response, next) => {
 	User.findOne({
 		email: request.body.email
 	}, (error, user) => {
-		if (error) throw error;
+		if (error) response.status(401).send({status: 400, message: "User not found"});
 
 		if (!user) {
 			response.status(401).send({status: 400, message: "User not found"});
