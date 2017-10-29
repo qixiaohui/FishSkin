@@ -2,12 +2,18 @@
 'use strict'
 
 const express = require('express');
-const router = express.Router();
-
+const passport = require('passport');
 const register = require('./gateway/user/register');
 const signin = require('./gateway/user/signin');
+const product = require('./gateway/product/product');
 
-router.use('/signup', register);
-router.use('/signin', signin);
+module.exports = (app, autoIncrement) => {
+	passport.initialize(app);
+	const router = express.Router();
 
-module.exports = router;
+	router.use('/signup', register(passport, autoIncrement));
+	router.use('/signin', signin(passport, autoIncrement));
+	router.use('/product', product(passport, autoIncrement));
+
+	return router;
+};

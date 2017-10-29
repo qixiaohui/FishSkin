@@ -14,7 +14,6 @@ const mongoose = require('mongoose');
 const passport = require("passport");
 const _ = require('underscore');
 var port = 8080;
-const router = require('./router');
 const autoIncrement = require('mongoose-auto-increment');
 const config = require('./config/db');
 
@@ -35,12 +34,12 @@ app.use(bodyParser.json());
 app.use(compress());
 app.use(cors());
 app.use(cookieParser());
-app.use(passport.initialize());
+
+let connection = mongoose.connect(config.database);
+autoIncrement.initialize(connection);
+
+const router = require('./router')(app, autoIncrement);
 app.use(router);
-
-mongoose.connect(config.database);
-
-const connection = autoIncrement.initialize(connection);
 
 if(process.env.NODE_ENV == 'production') {
 	app.use(logger('tiny'));
