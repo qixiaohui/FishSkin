@@ -29,7 +29,7 @@ app.use((request, response, next) => {
 	next();
 });
 
-app.use(bodyParser.urlencoded({extend: true}));
+//app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(compress());
 app.use(cors());
@@ -37,8 +37,10 @@ app.use(cookieParser());
 
 let connection = mongoose.connect(config.database);
 autoIncrement.initialize(connection);
+app.use(passport.initialize());
+require("./config/passport")(passport);
 
-const router = require('./router')(app, autoIncrement);
+const router = require('./router')(passport);
 app.use(router);
 
 if(process.env.NODE_ENV == 'production') {
@@ -55,3 +57,4 @@ app.get('/ping', function(req, res) {
 app.listen(process.env.PORT || port, function(){
 	console.log("server listening on port: "+(process.env.PORT || port));
 });
+

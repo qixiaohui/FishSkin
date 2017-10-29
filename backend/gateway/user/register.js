@@ -3,10 +3,9 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const user = require("../../model/user/schema");
+const User = require("../../model/user/schema").data;
 
-module.exports = (passport, autoIncrement) => {
-	user(autoIncrement);
+module.exports = (passport) => {
 	router.post("/account", (request, response, next) => {
 		if (!request.body.email || !request.body.password) {
 			response.json({status: 400, message: "please provide username and password"});
@@ -21,7 +20,10 @@ module.exports = (passport, autoIncrement) => {
 				if (error) {
 					return response.json({status: 400, message: "email already registered"});
 				}
-				return response.json({status: 200, message: "success"});
+				return response.status(200).send({
+					user: newUser,
+					success: true
+				});
 			});
 		}
 	});

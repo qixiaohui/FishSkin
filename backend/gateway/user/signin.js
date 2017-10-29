@@ -3,11 +3,11 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const user = require("../../model/user/schema");
+const User = require("../../model/user/schema").data;
 const config = require("../../config/db");
 const jwt = require('jsonwebtoken');
 
-module.exports = (passport, autoIncrement) => {
+module.exports = (passport) => {
 	router.post("/account", (request, response, next) => {
 		User.findOne({
 			email: request.body.email
@@ -22,9 +22,9 @@ module.exports = (passport, autoIncrement) => {
 					if (match && !error) {
 						// If user found, password match then generate jwt token
 						const token = jwt.sign({data: JSON.stringify(user)}, config.secret);
-						response.json({status: 200, token: "JWT " + token});
+						return response.json({status: 200, token: "JWT " + token});
 					} else {
-						response.status(401).send({status: 400, message: "Wrong password"});
+						return response.status(401).send({status: 400, message: "Wrong password"});
 					}
 				});
 			}

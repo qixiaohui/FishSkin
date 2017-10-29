@@ -3,22 +3,41 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const product = require("../../model/product/schema");
+const Product = require("../../model/product/schema").data;
 const config = require("../../config/db");
 const jwt = require('jsonwebtoken');
 
-module.exports = (passport, autoIncrement) => {
-	product(autoIncrement);
-	router.get("/product/all", (request, response, next) => {
+module.exports = (passport) => {
+	router.get("/all", (request, response, next) => {
 		Product.find({}, (error, products) => {
 			if (error) response.status(401).send({status: 400, message: "Product not found"});
 
-			response.status(200).send(products);
+			return response.status(200).send(products);
 		});	
 	});
 
-	router.post("/product/create", passport.authenticate('jwt', { session: false }), (request, response) => {
+	router.post("/create", passport.authenticate('jwt', { session: false }), (request, response) => {
+		console.log(JSON.stringify(request.body));
+		var product = new Product({
+			name: request.body.name,
+			stock: request.body.stock,
+			price: request.body.price,
+			description: request.body.description,
+			productImage: request.body.productImage,
+			discountPrice: request.body.discountPrice,
+			timestamp: request.body.timestamp,
+			lastupdate: request.body.lastupdate
+		});
 
+		product.save((error) => {
+			if (error) {
+				return response.send({status: 400, message: error.message});
+			}
+			return response.status(200).send({
+				producr: product,
+				success: true
+			});
+		});
 	});
 
 	return router;
