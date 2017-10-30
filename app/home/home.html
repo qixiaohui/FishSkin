@@ -5,11 +5,9 @@
 	    <h4 class="card-title">{{product.name}}</h4>
 	    <h5 class="card-title">{{product.price}}$</h5>
 	    <p class="card-text">
-	    	<p ng-repeat="text in product.description">
-	    		{{text}}
-	    	</p>
+	    	{{product.description[0]}}
 	    </p>
-	    <a href="#" class="btn btn-primary">See details</a>
+	    <a ng-click="vm.seeDetail()" class="btn btn-primary">See details</a>
 	  </div>
 	</div>
 </div>

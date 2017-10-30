@@ -9,5 +9,6 @@ const app = angular.module('app', [angularAnimate, angularUIRouter, angularSanit
 require('./main/main').default(app);
 require('./home/home').default(app);
 require('./login/login').default(app);
+require('./product/product').default(app);
 
 require('./router/router').default(app);

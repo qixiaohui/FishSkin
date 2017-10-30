@@ -16,6 +16,11 @@ export default ngModule => {
         		url: '/login',
         		template: '<login></login>'
         	}
+        ).state(
+            'main.product', {
+                url: '/product',
+                template: '<product></product>'
+            }
         );
 
         $urlRouterProvider.otherwise('/main/home');

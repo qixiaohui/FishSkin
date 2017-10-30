@@ -72,8 +72,9 @@
 	__webpack_require__(/*! ./main/main */ 18).default(app);
 	__webpack_require__(/*! ./home/home */ 22).default(app);
 	__webpack_require__(/*! ./login/login */ 48).default(app);
+	__webpack_require__(/*! ./product/product */ 52).default(app);
 	
-	__webpack_require__(/*! ./router/router */ 52).default(app);
+	__webpack_require__(/*! ./router/router */ 56).default(app);
 
 /***/ }),
 /* 1 */
@@ -44366,6 +44367,11 @@
 	                }).catch(function (error) {
 	                    console.error(error.message);
 	                });
+	
+	                //*** declare functions needed
+	                vm.seeDetail = function () {
+	                    $location.path("/main/product");
+	                };
 	            }
 	        };
 	    });
@@ -45938,7 +45944,7 @@
   \************************/
 /***/ (function(module, exports) {
 
-	module.exports = "<div class=\"row\">\n\t<div class=\"card col-md-2 col-sm-2 col-xs-3\" ng-repeat=\"product in vm.products\">\n\t  <img class=\"card-img-top\" ng-src=\"{{product.productImage[0]}}\" alt=\"Card image\" style=\"max-width: 400px; width: 300px; height: 300px\">\n\t  <div class=\"card-body\" style=\"height: 50px\">\n\t    <h4 class=\"card-title\">{{product.name}}</h4>\n\t    <h5 class=\"card-title\">{{product.price}}$</h5>\n\t    <p class=\"card-text\">\n\t    \t<p ng-repeat=\"text in product.description\">\n\t    \t\t{{text}}\n\t    \t</p>\n\t    </p>\n\t    <a href=\"#\" class=\"btn btn-primary\">See details</a>\n\t  </div>\n\t</div>\n</div>"
+	module.exports = "<div class=\"row\">\n\t<div class=\"card col-md-2 col-sm-2 col-xs-3\" ng-repeat=\"product in vm.products\">\n\t  <img class=\"card-img-top\" ng-src=\"{{product.productImage[0]}}\" alt=\"Card image\" style=\"max-width: 400px; width: 300px; height: 300px\">\n\t  <div class=\"card-body\" style=\"height: 50px\">\n\t    <h4 class=\"card-title\">{{product.name}}</h4>\n\t    <h5 class=\"card-title\">{{product.price}}$</h5>\n\t    <p class=\"card-text\">\n\t    \t{{product.description[0]}}\n\t    </p>\n\t    <a ng-click=\"vm.seeDetail()\" class=\"btn btn-primary\">See details</a>\n\t  </div>\n\t</div>\n</div>"
 
 /***/ }),
 /* 48 */
@@ -46091,6 +46097,96 @@
 
 /***/ }),
 /* 52 */
+/*!****************************!*\
+  !*** ./product/product.js ***!
+  \****************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var service = __webpack_require__(/*! ../service/service */ 23);
+	var config = __webpack_require__(/*! ../config/config */ 44);
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("product", function () {
+	        __webpack_require__(/*! ./product.css */ 53);
+	        return {
+	            restrict: "E",
+	            scope: true,
+	            template: __webpack_require__(/*! ./product.html */ 55),
+	            controllerAs: "vm",
+	            controller: function controller($rootScope, $location, $scope, $timeout) {
+	                var vm = this;
+	            }
+	        };
+	    });
+	};
+
+/***/ }),
+/* 53 */
+/*!*****************************!*\
+  !*** ./product/product.css ***!
+  \*****************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !../../~/css-loader!./product.css */ 54);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// Prepare cssTransformation
+	var transform;
+	
+	var options = {"hmr":true}
+	options.transform = transform
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ../../~/style-loader/lib/addStyles.js */ 9)(content, options);
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./product.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./product.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ }),
+/* 54 */
+/*!*********************************************!*\
+  !*** ../~/css-loader!./product/product.css ***!
+  \*********************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "\n/*****************globals*************/\nbody {\n  font-family: 'open sans';\n  overflow-x: hidden; }\n\nimg {\n  max-width: 100%; }\n\n.preview {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column; }\n  @media screen and (max-width: 996px) {\n    .preview {\n      margin-bottom: 20px; } }\n\n.preview-pic {\n  -webkit-box-flex: 1;\n  -webkit-flex-grow: 1;\n      -ms-flex-positive: 1;\n          flex-grow: 1; }\n\n.preview-thumbnail.nav-tabs {\n  border: none;\n  margin-top: 15px; }\n  .preview-thumbnail.nav-tabs li {\n    width: 18%;\n    margin-right: 2.5%; }\n    .preview-thumbnail.nav-tabs li img {\n      max-width: 100%;\n      display: block; }\n    .preview-thumbnail.nav-tabs li a {\n      padding: 0;\n      margin: 0; }\n    .preview-thumbnail.nav-tabs li:last-of-type {\n      margin-right: 0; }\n\n.tab-content {\n  overflow: hidden; }\n  .tab-content img {\n    width: 100%;\n    -webkit-animation-name: opacity;\n            animation-name: opacity;\n    -webkit-animation-duration: .3s;\n            animation-duration: .3s; }\n\n.card {\n  margin-top: 50px;\n  background: #eee;\n  padding: 3em;\n  line-height: 1.5em; }\n\n@media screen and (min-width: 997px) {\n  .wrapper {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex; } }\n\n.details {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column; }\n\n.colors {\n  -webkit-box-flex: 1;\n  -webkit-flex-grow: 1;\n      -ms-flex-positive: 1;\n          flex-grow: 1; }\n\n.product-title, .price, .sizes, .colors {\n  text-transform: UPPERCASE;\n  font-weight: bold; }\n\n.checked, .price span {\n  color: #ff9f1a; }\n\n.product-title, .rating, .product-description, .price, .vote, .sizes {\n  margin-bottom: 15px; }\n\n.product-title {\n  margin-top: 0; }\n\n.size {\n  margin-right: 10px; }\n  .size:first-of-type {\n    margin-left: 40px; }\n\n.color {\n  display: inline-block;\n  vertical-align: middle;\n  margin-right: 10px;\n  height: 2em;\n  width: 2em;\n  border-radius: 2px; }\n  .color:first-of-type {\n    margin-left: 20px; }\n\n.add-to-cart, .like {\n  background: #ff9f1a;\n  padding: 1.2em 1.5em;\n  border: none;\n  text-transform: UPPERCASE;\n  font-weight: bold;\n  color: #fff;\n  -webkit-transition: background .3s ease;\n          transition: background .3s ease; }\n  .add-to-cart:hover, .like:hover {\n    background: #b36800;\n    color: #fff; }\n\n.not-available {\n  text-align: center;\n  line-height: 2em; }\n  .not-available:before {\n    font-family: fontawesome;\n    content: \"\\F00D\";\n    color: #fff; }\n\n.orange {\n  background: #ff9f1a; }\n\n.green {\n  background: #85ad00; }\n\n.blue {\n  background: #0076ad; }\n\n.tooltip-inner {\n  padding: 1.3em; }\n\n@-webkit-keyframes opacity {\n  0% {\n    opacity: 0;\n    -webkit-transform: scale(3);\n            transform: scale(3); }\n  100% {\n    opacity: 1;\n    -webkit-transform: scale(1);\n            transform: scale(1); } }\n\n@keyframes opacity {\n  0% {\n    opacity: 0;\n    -webkit-transform: scale(3);\n            transform: scale(3); }\n  100% {\n    opacity: 1;\n    -webkit-transform: scale(1);\n            transform: scale(1); } }\n\n/*# sourceMappingURL=style.css.map */", ""]);
+	
+	// exports
+
+
+/***/ }),
+/* 55 */
+/*!******************************!*\
+  !*** ./product/product.html ***!
+  \******************************/
+/***/ (function(module, exports) {
+
+	module.exports = "<div class=\"container\">\n\t<div class=\"card\">\n\t\t<div class=\"container-fliud\">\n\t\t\t<div class=\"wrapper row\">\n\t\t\t\t<div class=\"preview col-md-6\">\n\t\t\t\t\t\n\t\t\t\t\t<div class=\"preview-pic tab-content\">\n\t\t\t\t\t  <div class=\"tab-pane active\" id=\"pic-1\"><img src=\"https://img1.etsystatic.com/076/0/6436526/il_570xN.827154143_coxh.jpg\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-2\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-3\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-4\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-5\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<ul class=\"preview-thumbnail nav nav-tabs\">\n\t\t\t\t\t  <li class=\"active\"><a data-target=\"#pic-1\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-2\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-3\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-4\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-5\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t</ul>\n\t\t\t\t\t\n\t\t\t\t</div>\n\t\t\t\t<div class=\"details col-md-6\">\n\t\t\t\t\t<h3 class=\"product-title\">men's shoes fashion</h3>\n\t\t\t\t\t<div class=\"rating\">\n\t\t\t\t\t\t<div class=\"stars\">\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star\"></span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<span class=\"review-no\">41 reviews</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<p class=\"product-description\">Suspendisse quos? Tempus cras iure temporibus? Eu laudantium cubilia sem sem! Repudiandae et! Massa senectus enim minim sociosqu delectus posuere.</p>\n\t\t\t\t\t<h4 class=\"price\">current price: <span>$180</span></h4>\n\t\t\t\t\t<p class=\"vote\"><strong>91%</strong> of buyers enjoyed this product! <strong>(87 votes)</strong></p>\n\t\t\t\t\t<h5 class=\"sizes\">sizes:\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"small\">s</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"medium\">m</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"large\">l</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"xtra large\">xl</span>\n\t\t\t\t\t</h5>\n\t\t\t\t\t<h5 class=\"colors\">colors:\n\t\t\t\t\t\t<span class=\"color orange not-available\" data-toggle=\"tooltip\" title=\"Not In store\"></span>\n\t\t\t\t\t\t<span class=\"color green\"></span>\n\t\t\t\t\t\t<span class=\"color blue\"></span>\n\t\t\t\t\t</h5>\n\t\t\t\t\t<div class=\"action\">\n\t\t\t\t\t\t<button class=\"add-to-cart btn btn-default\" type=\"button\">add to cart</button>\n\t\t\t\t\t\t<button class=\"like btn btn-default\" type=\"button\"><span class=\"fa fa-heart\"></span></button>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>"
+
+/***/ }),
+/* 56 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/
@@ -46113,6 +46209,9 @@
 	        }).state('main.login', {
 	            url: '/login',
 	            template: '<login></login>'
+	        }).state('main.product', {
+	            url: '/product',
+	            template: '<product></product>'
 	        });
 	
 	        $urlRouterProvider.otherwise('/main/home');

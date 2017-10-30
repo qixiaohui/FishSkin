@@ -19,6 +19,11 @@ export default (ngModule) => {
                 }).catch((error) => {
                     console.error(error.message);
                 });
+
+                //*** declare functions needed
+                vm.seeDetail = () => {
+                    $location.path("/main/product");
+                }
             }
         }
     });
