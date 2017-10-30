@@ -22,6 +22,7 @@ module.exports = (passport) => {
 				}
 				return response.status(200).send({
 					user: newUser,
+					email: newUser.email,
 					success: true
 				});
 			});
