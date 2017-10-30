@@ -73,8 +73,10 @@
 	__webpack_require__(/*! ./home/home */ 22).default(app);
 	__webpack_require__(/*! ./login/login */ 48).default(app);
 	__webpack_require__(/*! ./product/product */ 52).default(app);
+	__webpack_require__(/*! ./cart/cart */ 56).default(app);
+	__webpack_require__(/*! ./service/dataProvider */ 60).default(app);
 	
-	__webpack_require__(/*! ./router/router */ 56).default(app);
+	__webpack_require__(/*! ./router/router */ 61).default(app);
 
 /***/ }),
 /* 1 */
@@ -44357,7 +44359,7 @@
 	            scope: true,
 	            template: __webpack_require__(/*! ./home.html */ 47),
 	            controllerAs: "vm",
-	            controller: function controller($rootScope, $location, $scope, $timeout) {
+	            controller: function controller($rootScope, $location, $scope, $timeout, dataprovider) {
 	                var vm = this;
 	
 	                var products = [];
@@ -44369,7 +44371,8 @@
 	                });
 	
 	                //*** declare functions needed
-	                vm.seeDetail = function () {
+	                vm.seeDetail = function (product) {
+	                    dataprovider.setData(product);
 	                    $location.path("/main/product");
 	                };
 	            }
@@ -45944,7 +45947,7 @@
   \************************/
 /***/ (function(module, exports) {
 
-	module.exports = "<div class=\"row\">\n\t<div class=\"card col-md-2 col-sm-2 col-xs-3\" ng-repeat=\"product in vm.products\">\n\t  <img class=\"card-img-top\" ng-src=\"{{product.productImage[0]}}\" alt=\"Card image\" style=\"max-width: 400px; width: 300px; height: 300px\">\n\t  <div class=\"card-body\" style=\"height: 50px\">\n\t    <h4 class=\"card-title\">{{product.name}}</h4>\n\t    <h5 class=\"card-title\">{{product.price}}$</h5>\n\t    <p class=\"card-text\">\n\t    \t{{product.description[0]}}\n\t    </p>\n\t    <a ng-click=\"vm.seeDetail()\" class=\"btn btn-primary\">See details</a>\n\t  </div>\n\t</div>\n</div>"
+	module.exports = "<div class=\"container\">\n\t<div class=\"wrapper row\">\n\t\t<div class=\"card col-md-2 col-sm-2 col-xs-3\" style=\"width: 350px;\" ng-repeat=\"product in vm.products\">\n\t\t  <img class=\"card-img-top\" ng-src=\"{{product.productImage[0]}}\" alt=\"Card image\" style=\"max-width: 300px; width: 300px; height: 300px\">\n\t\t  <div class=\"card-block\">\n\t\t    <h4 class=\"card-title\" style=\"padding-left: 10px\">\n\t\t    \t{{product.name}}\n\t\t    \t<br/>\n\t\t    \t{{product.price}}$\n\t\t    </h4>\n\t\t    <p class=\"card-text\" style=\"padding-left: 10px\">\n\t\t    \t{{product.description[0]}}\n\t\t    </p>\n\t\t    <a ng-click=\"vm.seeDetail(product)\" class=\"btn btn-primary\">See details</a>\n\t\t  </div>\n\t\t</div>\n\t</div>\n</div>"
 
 /***/ }),
 /* 48 */
@@ -45981,7 +45984,7 @@
 	                    email: null,
 	                    password: null
 	                };
-	                vm.login = true;
+	                vm.loginShow = true;
 	
 	                vm.login = function () {
 	                    var url = "" + config.BASE_URL + config.LOGIN;
@@ -46093,7 +46096,7 @@
   \**************************/
 /***/ (function(module, exports) {
 
-	module.exports = "<div class=\"container\" id=\"login-container\">\n\t<div class=\"row login-panel\">\n\t\t<div class=\"col-md-6 col-md-offset-3\">\n\t\t\t<div class=\"panel panel-login\">\n\t\t\t\t<div class=\"panel-heading\">\n\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t<div class=\"col-xs-6\">\n\t\t\t\t\t\t\t<a ng-class=\"active\" ng-click=\"vm.login = !vm.login\">Login</a>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"col-xs-6\">\n\t\t\t\t\t\t\t<a id=\"register-form-link\" ng-click=\"vm.login = !vm.login\">Register</a>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<hr>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t\t\t\t<form id=\"login-form\" role=\"form\" style=\"display: block;\" ng-show=\"vm.login\">\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<input type=\"text\" name=\"username\" id=\"username\" tabindex=\"1\" class=\"form-control\" placeholder=\"Username\" ng-model=\"vm.user.email\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\" ng-model=\"vm.user.password\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group text-center\">\n\t\t\t\t\t\t\t\t\t<input type=\"checkbox\" tabindex=\"3\" class=\"\" name=\"remember\" id=\"remember\">\n\t\t\t\t\t\t\t\t\t<label for=\"remember\"> Remember Me</label>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group text-center\" ng-if=\"vm.errorMessage\">\n\t\t\t\t\t\t\t\t\t<input type=\"checkbox\" tabindex=\"3\" class=\"\" name=\"errormessage\" id=\"errormessage\">\n\t\t\t\t\t\t\t\t\t<label for=\"errormessage\"> {{vm.errorMessage}} </label>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-sm-6 col-sm-offset-3\">\n\t\t\t\t\t\t\t\t\t\t\t<input name=\"login-submit\" id=\"login-submit\" tabindex=\"4\" class=\"form-control btn btn-login\" value=\"Log In\" ng-click=\"vm.login()\">\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"text-center\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a tabindex=\"5\" class=\"forgot-password\">Forgot Password?</a>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t\t<form id=\"register-form\" role=\"form\" ng-hide=\"vm.login\">\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<input type=\"email\" name=\"email\" id=\"email\" tabindex=\"1\" class=\"form-control\" placeholder=\"Email Address\" ng-model=\"vm.register.email\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\" ng-model=\"vm.register.password\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<input type=\"password\" name=\"confirm-password\" id=\"confirm-password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Confirm Password\" ng-model=\"vm.register.confirm\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-sm-6 col-sm-offset-3\">\n\t\t\t\t\t\t\t\t\t\t\t<input name=\"register-submit\" id=\"register-submit\" tabindex=\"4\" class=\"form-control btn btn-register\" value=\"Register Now\" ng-click=\"vm.register()\">\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>"
+	module.exports = "<div class=\"container\" id=\"login-container\">\n\t<div class=\"row login-panel\">\n\t\t<div class=\"col-md-6 col-md-offset-3\">\n\t\t\t<div class=\"panel panel-login\">\n\t\t\t\t<div class=\"panel-heading\">\n\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t<div class=\"col-xs-6\">\n\t\t\t\t\t\t\t<a ng-class=\"active\" ng-click=\"vm.loginShow = !vm.loginShow\">Login</a>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"col-xs-6\">\n\t\t\t\t\t\t\t<a id=\"register-form-link\" ng-click=\"vm.loginShow = !vm.loginShow\">Register</a>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<hr>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"panel-body\">\n\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t\t\t\t<form id=\"login-form\" role=\"form\" style=\"display: block;\" ng-show=\"vm.loginShow\">\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<input type=\"text\" name=\"username\" id=\"username\" tabindex=\"1\" class=\"form-control\" placeholder=\"Username\" ng-model=\"vm.user.email\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\" ng-model=\"vm.user.password\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group text-center\">\n\t\t\t\t\t\t\t\t\t<input type=\"checkbox\" tabindex=\"3\" class=\"\" name=\"remember\" id=\"remember\">\n\t\t\t\t\t\t\t\t\t<label for=\"remember\"> Remember Me</label>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group text-center\" ng-if=\"vm.errorMessage\">\n\t\t\t\t\t\t\t\t\t<input type=\"checkbox\" tabindex=\"3\" class=\"\" name=\"errormessage\" id=\"errormessage\">\n\t\t\t\t\t\t\t\t\t<label for=\"errormessage\"> {{vm.errorMessage}} </label>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-sm-6 col-sm-offset-3\">\n\t\t\t\t\t\t\t\t\t\t\t<input name=\"login-submit\" id=\"login-submit\" tabindex=\"4\" class=\"form-control btn btn-login\" value=\"Log In\" ng-click=\"vm.login()\">\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-lg-12\">\n\t\t\t\t\t\t\t\t\t\t\t<div class=\"text-center\">\n\t\t\t\t\t\t\t\t\t\t\t\t<a tabindex=\"5\" class=\"forgot-password\">Forgot Password?</a>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t\t<form id=\"register-form\" role=\"form\" ng-hide=\"vm.loginShow\">\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<input type=\"email\" name=\"email\" id=\"email\" tabindex=\"1\" class=\"form-control\" placeholder=\"Email Address\" ng-model=\"vm.register.email\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<input type=\"password\" name=\"password\" id=\"password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Password\" ng-model=\"vm.register.password\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<input type=\"password\" name=\"confirm-password\" id=\"confirm-password\" tabindex=\"2\" class=\"form-control\" placeholder=\"Confirm Password\" ng-model=\"vm.register.confirm\">\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class=\"form-group\">\n\t\t\t\t\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t\t\t\t\t<div class=\"col-sm-6 col-sm-offset-3\">\n\t\t\t\t\t\t\t\t\t\t\t<input name=\"register-submit\" id=\"register-submit\" tabindex=\"4\" class=\"form-control btn btn-register\" value=\"Register Now\" ng-click=\"vm.register()\">\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>"
 
 /***/ }),
 /* 52 */
@@ -46118,8 +46121,20 @@
 	            scope: true,
 	            template: __webpack_require__(/*! ./product.html */ 55),
 	            controllerAs: "vm",
-	            controller: function controller($rootScope, $location, $scope, $timeout) {
+	            controller: function controller($rootScope, $location, $scope, $timeout, dataprovider) {
 	                var vm = this;
+	
+	                vm.product = dataprovider.getData();
+	
+	                if (!vm.product) {
+	                    $location.path("/main/home");
+	                }
+	
+	                //*** add functions to be used
+	                vm.addToCart = function () {
+	                    dataprovider.addProduct(vm.product);
+	                    $location.path("/main/cart");
+	                };
 	            }
 	        };
 	    });
@@ -46171,7 +46186,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n/*****************globals*************/\nbody {\n  font-family: 'open sans';\n  overflow-x: hidden; }\n\nimg {\n  max-width: 100%; }\n\n.preview {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column; }\n  @media screen and (max-width: 996px) {\n    .preview {\n      margin-bottom: 20px; } }\n\n.preview-pic {\n  -webkit-box-flex: 1;\n  -webkit-flex-grow: 1;\n      -ms-flex-positive: 1;\n          flex-grow: 1; }\n\n.preview-thumbnail.nav-tabs {\n  border: none;\n  margin-top: 15px; }\n  .preview-thumbnail.nav-tabs li {\n    width: 18%;\n    margin-right: 2.5%; }\n    .preview-thumbnail.nav-tabs li img {\n      max-width: 100%;\n      display: block; }\n    .preview-thumbnail.nav-tabs li a {\n      padding: 0;\n      margin: 0; }\n    .preview-thumbnail.nav-tabs li:last-of-type {\n      margin-right: 0; }\n\n.tab-content {\n  overflow: hidden; }\n  .tab-content img {\n    width: 100%;\n    -webkit-animation-name: opacity;\n            animation-name: opacity;\n    -webkit-animation-duration: .3s;\n            animation-duration: .3s; }\n\n.card {\n  margin-top: 50px;\n  background: #eee;\n  padding: 3em;\n  line-height: 1.5em; }\n\n@media screen and (min-width: 997px) {\n  .wrapper {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex; } }\n\n.details {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column; }\n\n.colors {\n  -webkit-box-flex: 1;\n  -webkit-flex-grow: 1;\n      -ms-flex-positive: 1;\n          flex-grow: 1; }\n\n.product-title, .price, .sizes, .colors {\n  text-transform: UPPERCASE;\n  font-weight: bold; }\n\n.checked, .price span {\n  color: #ff9f1a; }\n\n.product-title, .rating, .product-description, .price, .vote, .sizes {\n  margin-bottom: 15px; }\n\n.product-title {\n  margin-top: 0; }\n\n.size {\n  margin-right: 10px; }\n  .size:first-of-type {\n    margin-left: 40px; }\n\n.color {\n  display: inline-block;\n  vertical-align: middle;\n  margin-right: 10px;\n  height: 2em;\n  width: 2em;\n  border-radius: 2px; }\n  .color:first-of-type {\n    margin-left: 20px; }\n\n.add-to-cart, .like {\n  background: #ff9f1a;\n  padding: 1.2em 1.5em;\n  border: none;\n  text-transform: UPPERCASE;\n  font-weight: bold;\n  color: #fff;\n  -webkit-transition: background .3s ease;\n          transition: background .3s ease; }\n  .add-to-cart:hover, .like:hover {\n    background: #b36800;\n    color: #fff; }\n\n.not-available {\n  text-align: center;\n  line-height: 2em; }\n  .not-available:before {\n    font-family: fontawesome;\n    content: \"\\F00D\";\n    color: #fff; }\n\n.orange {\n  background: #ff9f1a; }\n\n.green {\n  background: #85ad00; }\n\n.blue {\n  background: #0076ad; }\n\n.tooltip-inner {\n  padding: 1.3em; }\n\n@-webkit-keyframes opacity {\n  0% {\n    opacity: 0;\n    -webkit-transform: scale(3);\n            transform: scale(3); }\n  100% {\n    opacity: 1;\n    -webkit-transform: scale(1);\n            transform: scale(1); } }\n\n@keyframes opacity {\n  0% {\n    opacity: 0;\n    -webkit-transform: scale(3);\n            transform: scale(3); }\n  100% {\n    opacity: 1;\n    -webkit-transform: scale(1);\n            transform: scale(1); } }\n\n/*# sourceMappingURL=style.css.map */", ""]);
+	exports.push([module.id, "\n/*****************globals*************/\nbody {\n  font-family: 'open sans';\n  overflow-x: hidden; }\n\nimg {\n  max-width: 100%; }\n\n.preview {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column; }\n  @media screen and (max-width: 996px) {\n    .preview {\n      margin-bottom: 20px; } }\n\n.preview-pic {\n  -webkit-box-flex: 1;\n  -webkit-flex-grow: 1;\n      -ms-flex-positive: 1;\n          flex-grow: 1; }\n\n.preview-thumbnail.nav-tabs {\n  border: none;\n  margin-top: 15px; }\n  .preview-thumbnail.nav-tabs li {\n    width: 18%;\n    margin-right: 2.5%; }\n    .preview-thumbnail.nav-tabs li img {\n      max-width: 100%;\n      display: block; }\n    .preview-thumbnail.nav-tabs li a {\n      padding: 0;\n      margin: 0; }\n    .preview-thumbnail.nav-tabs li:last-of-type {\n      margin-right: 0; }\n\n.tab-content {\n  overflow: hidden; }\n  .tab-content img {\n    width: 100%;\n    -webkit-animation-name: opacity;\n            animation-name: opacity;\n    -webkit-animation-duration: .3s;\n            animation-duration: .3s; }\n\n.productCard {\n  margin-top: 50px;\n  background: #eee;\n  padding: 3em;\n  line-height: 1.5em; }\n\n@media screen and (min-width: 997px) {\n  .wrapper {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex; } }\n\n.details {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column; }\n\n.colors {\n  -webkit-box-flex: 1;\n  -webkit-flex-grow: 1;\n      -ms-flex-positive: 1;\n          flex-grow: 1; }\n\n.product-title, .price, .sizes, .colors {\n  text-transform: UPPERCASE;\n  font-weight: bold; }\n\n.checked, .price span {\n  color: #ff9f1a; }\n\n.product-title, .rating, .product-description, .price, .vote, .sizes {\n  margin-bottom: 15px; }\n\n.product-title {\n  margin-top: 0; }\n\n.size {\n  margin-right: 10px; }\n  .size:first-of-type {\n    margin-left: 40px; }\n\n.color {\n  display: inline-block;\n  vertical-align: middle;\n  margin-right: 10px;\n  height: 2em;\n  width: 2em;\n  border-radius: 2px; }\n  .color:first-of-type {\n    margin-left: 20px; }\n\n.add-to-cart, .like {\n  background: #ff9f1a;\n  padding: 1.2em 1.5em;\n  border: none;\n  text-transform: UPPERCASE;\n  font-weight: bold;\n  color: #fff;\n  -webkit-transition: background .3s ease;\n          transition: background .3s ease; }\n  .add-to-cart:hover, .like:hover {\n    background: #b36800;\n    color: #fff; }\n\n.not-available {\n  text-align: center;\n  line-height: 2em; }\n  .not-available:before {\n    font-family: fontawesome;\n    content: \"\\F00D\";\n    color: #fff; }\n\n.orange {\n  background: #ff9f1a; }\n\n.green {\n  background: #85ad00; }\n\n.blue {\n  background: #0076ad; }\n\n.tooltip-inner {\n  padding: 1.3em; }\n\n@-webkit-keyframes opacity {\n  0% {\n    opacity: 0;\n    -webkit-transform: scale(3);\n            transform: scale(3); }\n  100% {\n    opacity: 1;\n    -webkit-transform: scale(1);\n            transform: scale(1); } }\n\n@keyframes opacity {\n  0% {\n    opacity: 0;\n    -webkit-transform: scale(3);\n            transform: scale(3); }\n  100% {\n    opacity: 1;\n    -webkit-transform: scale(1);\n            transform: scale(1); } }\n\n/*# sourceMappingURL=style.css.map */", ""]);
 	
 	// exports
 
@@ -46183,10 +46198,154 @@
   \******************************/
 /***/ (function(module, exports) {
 
-	module.exports = "<div class=\"container\">\n\t<div class=\"card\">\n\t\t<div class=\"container-fliud\">\n\t\t\t<div class=\"wrapper row\">\n\t\t\t\t<div class=\"preview col-md-6\">\n\t\t\t\t\t\n\t\t\t\t\t<div class=\"preview-pic tab-content\">\n\t\t\t\t\t  <div class=\"tab-pane active\" id=\"pic-1\"><img src=\"https://img1.etsystatic.com/076/0/6436526/il_570xN.827154143_coxh.jpg\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-2\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-3\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-4\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-5\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<ul class=\"preview-thumbnail nav nav-tabs\">\n\t\t\t\t\t  <li class=\"active\"><a data-target=\"#pic-1\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-2\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-3\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-4\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-5\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t</ul>\n\t\t\t\t\t\n\t\t\t\t</div>\n\t\t\t\t<div class=\"details col-md-6\">\n\t\t\t\t\t<h3 class=\"product-title\">men's shoes fashion</h3>\n\t\t\t\t\t<div class=\"rating\">\n\t\t\t\t\t\t<div class=\"stars\">\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star\"></span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<span class=\"review-no\">41 reviews</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<p class=\"product-description\">Suspendisse quos? Tempus cras iure temporibus? Eu laudantium cubilia sem sem! Repudiandae et! Massa senectus enim minim sociosqu delectus posuere.</p>\n\t\t\t\t\t<h4 class=\"price\">current price: <span>$180</span></h4>\n\t\t\t\t\t<p class=\"vote\"><strong>91%</strong> of buyers enjoyed this product! <strong>(87 votes)</strong></p>\n\t\t\t\t\t<h5 class=\"sizes\">sizes:\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"small\">s</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"medium\">m</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"large\">l</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"xtra large\">xl</span>\n\t\t\t\t\t</h5>\n\t\t\t\t\t<h5 class=\"colors\">colors:\n\t\t\t\t\t\t<span class=\"color orange not-available\" data-toggle=\"tooltip\" title=\"Not In store\"></span>\n\t\t\t\t\t\t<span class=\"color green\"></span>\n\t\t\t\t\t\t<span class=\"color blue\"></span>\n\t\t\t\t\t</h5>\n\t\t\t\t\t<div class=\"action\">\n\t\t\t\t\t\t<button class=\"add-to-cart btn btn-default\" type=\"button\">add to cart</button>\n\t\t\t\t\t\t<button class=\"like btn btn-default\" type=\"button\"><span class=\"fa fa-heart\"></span></button>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>"
+	module.exports = "<div class=\"container\">\n\t<div class=\"productCard\">\n\t\t<div class=\"container-fliud\">\n\t\t\t<div class=\"wrapper row\">\n\t\t\t\t<div class=\"preview col-md-6\">\n\t\t\t\t\t\n\t\t\t\t\t<div class=\"preview-pic tab-content\">\n\t\t\t\t\t  <div class=\"tab-pane active\" id=\"pic-1\"><img src=\"{{vm.product.productImage[0]}}\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-2\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-3\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-4\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-5\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<ul class=\"preview-thumbnail nav nav-tabs\">\n\t\t\t\t\t  <li class=\"active\"><a data-target=\"#pic-1\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-2\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-3\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-4\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-5\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t</ul>\n\t\t\t\t\t\n\t\t\t\t</div>\n\t\t\t\t<div class=\"details col-md-6\">\n\t\t\t\t\t<h3 class=\"product-title\">{{vm.product.name}}</h3>\n\t\t\t\t\t<div class=\"rating\">\n\t\t\t\t\t\t<div class=\"stars\">\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star\"></span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<span class=\"review-no\">41 reviews</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<p class=\"product-description\">\n\t\t\t\t\t\t<p ng-repeat=\"description in vm.product.description\">{{description}}</p>\n\t\t\t\t\t</p>\n\t\t\t\t\t<h4 class=\"price\">current price: <span>${{vm.product.price}}</span></h4>\n\t\t\t\t\t<h5 class=\"sizes\">sizes:\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"small\">s</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"medium\">m</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"large\">l</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"xtra large\">xl</span>\n\t\t\t\t\t</h5>\n\t\t\t\t\t<h5 class=\"colors\">colors:\n\t\t\t\t\t\t<span class=\"color orange not-available\" data-toggle=\"tooltip\" title=\"Not In store\"></span>\n\t\t\t\t\t\t<span class=\"color green\"></span>\n\t\t\t\t\t\t<span class=\"color blue\"></span>\n\t\t\t\t\t</h5>\n\t\t\t\t\t<div class=\"action\">\n\t\t\t\t\t\t<button class=\"add-to-cart btn btn-default\" type=\"button\" ng-click=\"vm.addToCart()\">add to cart</button>\n\t\t\t\t\t\t<button class=\"like btn btn-default\" type=\"button\"><span class=\"fa fa-heart\"></span></button>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>"
 
 /***/ }),
 /* 56 */
+/*!**********************!*\
+  !*** ./cart/cart.js ***!
+  \**********************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var service = __webpack_require__(/*! ../service/service */ 23);
+	var config = __webpack_require__(/*! ../config/config */ 44);
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("cart", function () {
+	        __webpack_require__(/*! ./cart.css */ 57);
+	        return {
+	            restrict: "E",
+	            scope: true,
+	            template: __webpack_require__(/*! ./cart.html */ 59),
+	            controllerAs: "vm",
+	            controller: function controller($rootScope, $location, $scope, $timeout, dataprovider) {
+	                var vm = this;
+	
+	                vm.products = dataprovider.getProduct();
+	            }
+	        };
+	    });
+	};
+
+/***/ }),
+/* 57 */
+/*!***********************!*\
+  !*** ./cart/cart.css ***!
+  \***********************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !../../~/css-loader!./cart.css */ 58);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// Prepare cssTransformation
+	var transform;
+	
+	var options = {"hmr":true}
+	options.transform = transform
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ../../~/style-loader/lib/addStyles.js */ 9)(content, options);
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./cart.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./cart.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ }),
+/* 58 */
+/*!***************************************!*\
+  !*** ../~/css-loader!./cart/cart.css ***!
+  \***************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".table>tbody>tr>td, .table>tfoot>tr>td{\n    vertical-align: middle;\n}\n@media screen and (max-width: 600px) {\n    table#cart tbody td .form-control{\n\t\twidth:20%;\n\t\tdisplay: inline !important;\n\t}\n\t.actions .btn{\n\t\twidth:36%;\n\t\tmargin:1.5em 0;\n\t}\n\t\n\t.actions .btn-info{\n\t\tfloat:left;\n\t}\n\t.actions .btn-danger{\n\t\tfloat:right;\n\t}\n\t\n\ttable#cart thead { display: none; }\n\ttable#cart tbody td { display: block; padding: .6rem; min-width:320px;}\n\ttable#cart tbody tr td:first-child { background: #333; color: #fff; }\n\ttable#cart tbody td:before {\n\t\tcontent: attr(data-th); font-weight: bold;\n\t\tdisplay: inline-block; width: 8rem;\n\t}\n\t\n\t\n\t\n\ttable#cart tfoot td{display:block; }\n\ttable#cart tfoot td .btn{display:block;}\n\t\n}", ""]);
+	
+	// exports
+
+
+/***/ }),
+/* 59 */
+/*!************************!*\
+  !*** ./cart/cart.html ***!
+  \************************/
+/***/ (function(module, exports) {
+
+	module.exports = "<div class=\"container\">\n\t<table id=\"cart\" class=\"table table-hover table-condensed\">\n\t\t<thead>\n\t\t\t<tr>\n\t\t\t\t<th style=\"width:50%\">Product</th>\n\t\t\t\t<th style=\"width:10%\">Price</th>\n\t\t\t\t<th style=\"width:8%\">Quantity</th>\n\t\t\t\t<th style=\"width:22%\" class=\"text-center\">Subtotal</th>\n\t\t\t\t<th style=\"width:10%\"></th>\n\t\t\t</tr>\n\t\t</thead>\n\t\t<tbody>\n\t\t\t<tr ng-repeat=\"product in vm.products\">\n\t\t\t\t<td data-th=\"Product\">\n\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t<div class=\"col-sm-2 hidden-xs\"><img src=\"{{product.productImage[0]}}\" alt=\"...\" class=\"img-responsive\"/></div>\n\t\t\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t\t\t<h4 class=\"nomargin\">{{product.name}}</h4>\n\t\t\t\t\t\t\t<p>{{product.description[0]}}</p>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</td>\n\t\t\t\t<td data-th=\"Price\">${{product.price}}</td>\n\t\t\t\t<td data-th=\"Quantity\">\n\t\t\t\t\t<input type=\"number\" class=\"form-control text-center\" value=\"1\">\n\t\t\t\t\t<p>{{product.stock}} in stock/p>\n\t\t\t\t</td>\n\t\t\t\t<td data-th=\"Subtotal\" class=\"text-center\">{{product.price}}</td>\n\t\t\t\t<td class=\"actions\" data-th=\"\">\n\t\t\t\t\t<button class=\"btn btn-info btn-sm\"><i class=\"fa fa-refresh\"></i></button>\n\t\t\t\t\t<button class=\"btn btn-danger btn-sm\"><i class=\"fa fa-trash-o\"></i></button>\t\t\t\t\t\t\t\t\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody>\n\t\t<tfoot>\n\t\t\t<tr class=\"visible-xs\">\n\t\t\t\t<td class=\"text-center\"><strong>Total 1.99</strong></td>\n\t\t\t</tr>\n\t\t\t<tr>\n\t\t\t\t<td><a href=\"#\" class=\"btn btn-warning\"><i class=\"fa fa-angle-left\"></i> Continue Shopping</a></td>\n\t\t\t\t<td colspan=\"2\" class=\"hidden-xs\"></td>\n\t\t\t\t<td class=\"hidden-xs text-center\"><strong>Total $1.99</strong></td>\n\t\t\t\t<td><a href=\"#\" class=\"btn btn-success btn-block\">Checkout <i class=\"fa fa-angle-right\"></i></a></td>\n\t\t\t</tr>\n\t\t</tfoot>\n\t</table>\n</div>"
+
+/***/ }),
+/* 60 */
+/*!*********************************!*\
+  !*** ./service/dataProvider.js ***!
+  \*********************************/
+/***/ (function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	exports.default = function (ngModule) {
+	    ngModule.service("dataprovider", function () {
+	        var data = {};
+	        var cart = [];
+	
+	        var setData = function setData(input) {
+	            data = input;
+	        };
+	
+	        var getData = function getData() {
+	            return data;
+	        };
+	
+	        var addProduct = function addProduct(product) {
+	            cart.push(product);
+	        };
+	
+	        var removeProduct = function removeProduct(product) {
+	            var index = cart.indexof(product);
+	            if (index > -1) {
+	                cart.splice(index, 1);
+	            }
+	            return cart;
+	        };
+	
+	        var getProduct = function getProduct() {
+	            return cart;
+	        };
+	
+	        return {
+	            setData: setData,
+	            getData: getData,
+	            addProduct: addProduct,
+	            removeProduct: removeProduct,
+	            getProduct: getProduct
+	        };
+	    });
+	};
+
+/***/ }),
+/* 61 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/
@@ -46212,6 +46371,9 @@
 	        }).state('main.product', {
 	            url: '/product',
 	            template: '<product></product>'
+	        }).state('main.cart', {
+	            url: '/cart',
+	            template: '<cart></cart>'
 	        });
 	
 	        $urlRouterProvider.otherwise('/main/home');

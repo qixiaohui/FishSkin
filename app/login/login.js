@@ -21,7 +21,7 @@ export default (ngModule) => {
                     email: null,
                     password: null
                 };
-                vm.login = true;
+                vm.loginShow = true;
 
                 vm.login = () => {
                     let url = `${config.BASE_URL}${config.LOGIN}`;

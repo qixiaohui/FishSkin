@@ -9,8 +9,20 @@ export default (ngModule) => {
             scope: true,
             template: require('./product.html'),
             controllerAs: "vm",
-            controller: function($rootScope, $location, $scope, $timeout){
+            controller: function($rootScope, $location, $scope, $timeout, dataprovider){
                 const vm = this;
+
+                vm.product = dataprovider.getData();
+
+                if (!vm.product) {
+                	$location.path("/main/home");
+                }
+
+                //*** add functions to be used
+                vm.addToCart = () => {
+                	dataprovider.addProduct(vm.product);
+                	$location.path("/main/cart");
+                };
             }
         }
     });

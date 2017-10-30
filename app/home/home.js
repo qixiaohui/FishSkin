@@ -9,7 +9,7 @@ export default (ngModule) => {
             scope: true,
             template: require('./home.html'),
             controllerAs: "vm",
-            controller: function($rootScope, $location, $scope, $timeout){
+            controller: function($rootScope, $location, $scope, $timeout, dataprovider){
                 const vm = this;
 
                 const products = [];
@@ -21,7 +21,8 @@ export default (ngModule) => {
                 });
 
                 //*** declare functions needed
-                vm.seeDetail = () => {
+                vm.seeDetail = (product) => {
+                    dataprovider.setData(product);
                     $location.path("/main/product");
                 }
             }
