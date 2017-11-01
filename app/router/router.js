@@ -26,6 +26,11 @@ export default ngModule => {
                 url: '/cart',
                 template: '<cart></cart>'
             }
+        ).state(
+            'main.checkout', {
+                url: '/checkout',
+                template: '<checkout></checkout>'
+            }
         );
 
         $urlRouterProvider.otherwise('/main/home');

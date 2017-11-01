@@ -48,8 +48,11 @@
 						<span class="color blue"></span>
 					</h5>
 					<div class="action">
-						<button class="add-to-cart btn btn-default" type="button" ng-click="vm.addToCart()">add to cart</button>
-						<button class="like btn btn-default" type="button"><span class="fa fa-heart"></span></button>
+						<button ng-hide="vm.isProductInCart" class="add-to-cart btn btn-default" type="button" ng-click="vm.addToCart()">add to cart</button>
+						<div ng-show="vm.isProductInCart">
+							<button  class="add-to-cart btn btn-default" type="button" ng-click="vm.proceedToCheckout()">Proceed to checkout</button>
+							<button class="btn btn-default" type="button" ng-click="vm.removeFromCart()">Remove from cart</button>
+						</div>
 					</div>
 				</div>
 			</div>

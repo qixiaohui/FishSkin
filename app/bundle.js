@@ -67,16 +67,19 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var app = angular.module('app', [_angularAnimate2.default, _angularUiRouter2.default, _angularSanitize2.default]);
+	var app = angular.module('app', [_angularAnimate2.default, _angularUiRouter2.default, _angularSanitize2.default, 'angularPayments']);
 	
 	__webpack_require__(/*! ./main/main */ 18).default(app);
 	__webpack_require__(/*! ./home/home */ 22).default(app);
 	__webpack_require__(/*! ./login/login */ 48).default(app);
 	__webpack_require__(/*! ./product/product */ 52).default(app);
 	__webpack_require__(/*! ./cart/cart */ 56).default(app);
-	__webpack_require__(/*! ./service/dataProvider */ 60).default(app);
+	__webpack_require__(/*! ./checkout/checkout */ 60).default(app);
+	__webpack_require__(/*! ./service/dataProvider */ 64).default(app);
 	
-	__webpack_require__(/*! ./router/router */ 61).default(app);
+	__webpack_require__(/*! ./router/router */ 65).default(app);
+	
+	Stripe.setPublishableKey('fillMePlease');
 
 /***/ }),
 /* 1 */
@@ -46125,6 +46128,7 @@
 	                var vm = this;
 	
 	                vm.product = dataprovider.getData();
+	                vm.isProductInCart = dataprovider.isProductInCart(vm.product);
 	
 	                if (!vm.product) {
 	                    $location.path("/main/home");
@@ -46134,6 +46138,15 @@
 	                vm.addToCart = function () {
 	                    dataprovider.addProduct(vm.product);
 	                    $location.path("/main/cart");
+	                };
+	
+	                vm.proceedToCheckout = function () {
+	                    $location.path("/main/cart");
+	                };
+	
+	                vm.removeFromCart = function () {
+	                    dataprovider.removeProduct(vm.product);
+	                    vm.isProductInCart = false;
 	                };
 	            }
 	        };
@@ -46198,7 +46211,7 @@
   \******************************/
 /***/ (function(module, exports) {
 
-	module.exports = "<div class=\"container\">\n\t<div class=\"productCard\">\n\t\t<div class=\"container-fliud\">\n\t\t\t<div class=\"wrapper row\">\n\t\t\t\t<div class=\"preview col-md-6\">\n\t\t\t\t\t\n\t\t\t\t\t<div class=\"preview-pic tab-content\">\n\t\t\t\t\t  <div class=\"tab-pane active\" id=\"pic-1\"><img src=\"{{vm.product.productImage[0]}}\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-2\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-3\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-4\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-5\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<ul class=\"preview-thumbnail nav nav-tabs\">\n\t\t\t\t\t  <li class=\"active\"><a data-target=\"#pic-1\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-2\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-3\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-4\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-5\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t</ul>\n\t\t\t\t\t\n\t\t\t\t</div>\n\t\t\t\t<div class=\"details col-md-6\">\n\t\t\t\t\t<h3 class=\"product-title\">{{vm.product.name}}</h3>\n\t\t\t\t\t<div class=\"rating\">\n\t\t\t\t\t\t<div class=\"stars\">\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star\"></span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<span class=\"review-no\">41 reviews</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<p class=\"product-description\">\n\t\t\t\t\t\t<p ng-repeat=\"description in vm.product.description\">{{description}}</p>\n\t\t\t\t\t</p>\n\t\t\t\t\t<h4 class=\"price\">current price: <span>${{vm.product.price}}</span></h4>\n\t\t\t\t\t<h5 class=\"sizes\">sizes:\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"small\">s</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"medium\">m</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"large\">l</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"xtra large\">xl</span>\n\t\t\t\t\t</h5>\n\t\t\t\t\t<h5 class=\"colors\">colors:\n\t\t\t\t\t\t<span class=\"color orange not-available\" data-toggle=\"tooltip\" title=\"Not In store\"></span>\n\t\t\t\t\t\t<span class=\"color green\"></span>\n\t\t\t\t\t\t<span class=\"color blue\"></span>\n\t\t\t\t\t</h5>\n\t\t\t\t\t<div class=\"action\">\n\t\t\t\t\t\t<button class=\"add-to-cart btn btn-default\" type=\"button\" ng-click=\"vm.addToCart()\">add to cart</button>\n\t\t\t\t\t\t<button class=\"like btn btn-default\" type=\"button\"><span class=\"fa fa-heart\"></span></button>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>"
+	module.exports = "<div class=\"container\">\n\t<div class=\"productCard\">\n\t\t<div class=\"container-fliud\">\n\t\t\t<div class=\"wrapper row\">\n\t\t\t\t<div class=\"preview col-md-6\">\n\t\t\t\t\t\n\t\t\t\t\t<div class=\"preview-pic tab-content\">\n\t\t\t\t\t  <div class=\"tab-pane active\" id=\"pic-1\"><img src=\"{{vm.product.productImage[0]}}\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-2\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-3\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-4\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t  <div class=\"tab-pane\" id=\"pic-5\"><img src=\"http://placekitten.com/400/252\" /></div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<ul class=\"preview-thumbnail nav nav-tabs\">\n\t\t\t\t\t  <li class=\"active\"><a data-target=\"#pic-1\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-2\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-3\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-4\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t  <li><a data-target=\"#pic-5\" data-toggle=\"tab\"><img src=\"http://placekitten.com/200/126\" /></a></li>\n\t\t\t\t\t</ul>\n\t\t\t\t\t\n\t\t\t\t</div>\n\t\t\t\t<div class=\"details col-md-6\">\n\t\t\t\t\t<h3 class=\"product-title\">{{vm.product.name}}</h3>\n\t\t\t\t\t<div class=\"rating\">\n\t\t\t\t\t\t<div class=\"stars\">\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star checked\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star\"></span>\n\t\t\t\t\t\t\t<span class=\"fa fa-star\"></span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<span class=\"review-no\">41 reviews</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t<p class=\"product-description\">\n\t\t\t\t\t\t<p ng-repeat=\"description in vm.product.description\">{{description}}</p>\n\t\t\t\t\t</p>\n\t\t\t\t\t<h4 class=\"price\">current price: <span>${{vm.product.price}}</span></h4>\n\t\t\t\t\t<h5 class=\"sizes\">sizes:\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"small\">s</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"medium\">m</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"large\">l</span>\n\t\t\t\t\t\t<span class=\"size\" data-toggle=\"tooltip\" title=\"xtra large\">xl</span>\n\t\t\t\t\t</h5>\n\t\t\t\t\t<h5 class=\"colors\">colors:\n\t\t\t\t\t\t<span class=\"color orange not-available\" data-toggle=\"tooltip\" title=\"Not In store\"></span>\n\t\t\t\t\t\t<span class=\"color green\"></span>\n\t\t\t\t\t\t<span class=\"color blue\"></span>\n\t\t\t\t\t</h5>\n\t\t\t\t\t<div class=\"action\">\n\t\t\t\t\t\t<button ng-hide=\"vm.isProductInCart\" class=\"add-to-cart btn btn-default\" type=\"button\" ng-click=\"vm.addToCart()\">add to cart</button>\n\t\t\t\t\t\t<div ng-show=\"vm.isProductInCart\">\n\t\t\t\t\t\t\t<button  class=\"add-to-cart btn btn-default\" type=\"button\" ng-click=\"vm.proceedToCheckout()\">Proceed to checkout</button>\n\t\t\t\t\t\t\t<button class=\"btn btn-default\" type=\"button\" ng-click=\"vm.removeFromCart()\">Remove from cart</button>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>"
 
 /***/ }),
 /* 56 */
@@ -46227,6 +46240,11 @@
 	                var vm = this;
 	
 	                vm.products = dataprovider.getProduct();
+	
+	                // declare functions needed
+	                vm.checkout = function () {
+	                    $location.path("/main/checkout");
+	                };
 	            }
 	        };
 	    });
@@ -46290,10 +46308,114 @@
   \************************/
 /***/ (function(module, exports) {
 
-	module.exports = "<div class=\"container\">\n\t<table id=\"cart\" class=\"table table-hover table-condensed\">\n\t\t<thead>\n\t\t\t<tr>\n\t\t\t\t<th style=\"width:50%\">Product</th>\n\t\t\t\t<th style=\"width:10%\">Price</th>\n\t\t\t\t<th style=\"width:8%\">Quantity</th>\n\t\t\t\t<th style=\"width:22%\" class=\"text-center\">Subtotal</th>\n\t\t\t\t<th style=\"width:10%\"></th>\n\t\t\t</tr>\n\t\t</thead>\n\t\t<tbody>\n\t\t\t<tr ng-repeat=\"product in vm.products\">\n\t\t\t\t<td data-th=\"Product\">\n\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t<div class=\"col-sm-2 hidden-xs\"><img src=\"{{product.productImage[0]}}\" alt=\"...\" class=\"img-responsive\"/></div>\n\t\t\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t\t\t<h4 class=\"nomargin\">{{product.name}}</h4>\n\t\t\t\t\t\t\t<p>{{product.description[0]}}</p>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</td>\n\t\t\t\t<td data-th=\"Price\">${{product.price}}</td>\n\t\t\t\t<td data-th=\"Quantity\">\n\t\t\t\t\t<input type=\"number\" class=\"form-control text-center\" value=\"1\">\n\t\t\t\t\t<p>{{product.stock}} in stock/p>\n\t\t\t\t</td>\n\t\t\t\t<td data-th=\"Subtotal\" class=\"text-center\">{{product.price}}</td>\n\t\t\t\t<td class=\"actions\" data-th=\"\">\n\t\t\t\t\t<button class=\"btn btn-info btn-sm\"><i class=\"fa fa-refresh\"></i></button>\n\t\t\t\t\t<button class=\"btn btn-danger btn-sm\"><i class=\"fa fa-trash-o\"></i></button>\t\t\t\t\t\t\t\t\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody>\n\t\t<tfoot>\n\t\t\t<tr class=\"visible-xs\">\n\t\t\t\t<td class=\"text-center\"><strong>Total 1.99</strong></td>\n\t\t\t</tr>\n\t\t\t<tr>\n\t\t\t\t<td><a href=\"#\" class=\"btn btn-warning\"><i class=\"fa fa-angle-left\"></i> Continue Shopping</a></td>\n\t\t\t\t<td colspan=\"2\" class=\"hidden-xs\"></td>\n\t\t\t\t<td class=\"hidden-xs text-center\"><strong>Total $1.99</strong></td>\n\t\t\t\t<td><a href=\"#\" class=\"btn btn-success btn-block\">Checkout <i class=\"fa fa-angle-right\"></i></a></td>\n\t\t\t</tr>\n\t\t</tfoot>\n\t</table>\n</div>"
+	module.exports = "<div class=\"container\">\n\t<table id=\"cart\" class=\"table table-hover table-condensed\">\n\t\t<thead>\n\t\t\t<tr>\n\t\t\t\t<th style=\"width:50%\">Product</th>\n\t\t\t\t<th style=\"width:10%\">Price</th>\n\t\t\t\t<th style=\"width:8%\">Quantity</th>\n\t\t\t\t<th style=\"width:22%\" class=\"text-center\">Subtotal</th>\n\t\t\t\t<th style=\"width:10%\"></th>\n\t\t\t</tr>\n\t\t</thead>\n\t\t<tbody>\n\t\t\t<tr ng-repeat=\"product in vm.products\">\n\t\t\t\t<td data-th=\"Product\">\n\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t<div class=\"col-sm-2 hidden-xs\"><img src=\"{{product.productImage[0]}}\" alt=\"...\" class=\"img-responsive\"/></div>\n\t\t\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t\t\t<h4 class=\"nomargin\">{{product.name}}</h4>\n\t\t\t\t\t\t\t<p>{{product.description[0]}}</p>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</td>\n\t\t\t\t<td data-th=\"Price\">${{product.price}}</td>\n\t\t\t\t<td data-th=\"Quantity\">\n\t\t\t\t\t<input type=\"number\" class=\"form-control text-center\" value=\"1\">\n\t\t\t\t\t<p>{{product.stock}} in stock</p>\n\t\t\t\t</td>\n\t\t\t\t<td data-th=\"Subtotal\" class=\"text-center\">{{product.price}}</td>\n\t\t\t\t<td class=\"actions\" data-th=\"\">\n\t\t\t\t\t<button class=\"btn btn-info btn-sm\"><i class=\"fa fa-refresh\"></i></button>\n\t\t\t\t\t<button class=\"btn btn-danger btn-sm\"><i class=\"fa fa-trash-o\"></i></button>\t\t\t\t\t\t\t\t\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody>\n\t\t<tfoot>\n\t\t\t<tr class=\"visible-xs\">\n\t\t\t\t<td class=\"text-center\"><strong>Total 1.99</strong></td>\n\t\t\t</tr>\n\t\t\t<tr>\n\t\t\t\t<td><a href=\"#\" class=\"btn btn-warning\"><i class=\"fa fa-angle-left\"></i> Continue Shopping</a></td>\n\t\t\t\t<td colspan=\"2\" class=\"hidden-xs\"></td>\n\t\t\t\t<td class=\"hidden-xs text-center\"><strong>Total $1.99</strong></td>\n\t\t\t\t<td><a ng-click=\"vm.checkout()\" class=\"btn btn-success btn-block\">Checkout <i class=\"fa fa-angle-right\"></i></a></td>\n\t\t\t</tr>\n\t\t</tfoot>\n\t</table>\n</div>"
 
 /***/ }),
 /* 60 */
+/*!******************************!*\
+  !*** ./checkout/checkout.js ***!
+  \******************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var service = __webpack_require__(/*! ../service/service */ 23);
+	var config = __webpack_require__(/*! ../config/config */ 44);
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("checkout", function () {
+	        __webpack_require__(/*! ./checkout.css */ 61);
+	        return {
+	            restrict: "E",
+	            scope: true,
+	            template: __webpack_require__(/*! ./checkout.html */ 63),
+	            controllerAs: "vm",
+	            controller: function controller($rootScope, $location, $scope, $timeout, dataprovider) {
+	                var vm = this;
+	
+	                vm.card = {
+	                    number: null,
+	                    expiry: null,
+	                    cvc: null
+	                };
+	
+	                vm.stripeCallback = function (code, result) {
+	                    if (result.error) {
+	                        window.alert("failed" + result.error.message);
+	                    } else {
+	                        window.alert("succeed");
+	                    }
+	                };
+	            }
+	        };
+	    });
+	};
+
+/***/ }),
+/* 61 */
+/*!*******************************!*\
+  !*** ./checkout/checkout.css ***!
+  \*******************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !../../~/css-loader!./checkout.css */ 62);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// Prepare cssTransformation
+	var transform;
+	
+	var options = {"hmr":true}
+	options.transform = transform
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ../../~/style-loader/lib/addStyles.js */ 9)(content, options);
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./checkout.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./checkout.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ }),
+/* 62 */
+/*!***********************************************!*\
+  !*** ../~/css-loader!./checkout/checkout.css ***!
+  \***********************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".ng-invalid {\n    color: red;\n}", ""]);
+	
+	// exports
+
+
+/***/ }),
+/* 63 */
+/*!********************************!*\
+  !*** ./checkout/checkout.html ***!
+  \********************************/
+/***/ (function(module, exports) {
+
+	module.exports = "<div class=\"container\">\n  <form class=\"form-horizontal\" stripe-form=\"vm.stripeCallback\" role=\"form\">\n    <fieldset>\n      <legend>Payment</legend>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"card-holder-name\">Name on Card</label>\n        <div class=\"col-sm-6\">\n          <input type=\"text\" class=\"form-control\" name=\"card-holder-name\" id=\"card-holder-name\" placeholder=\"Card Holder's Name\">\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardNumber\">Card Number</label>\n        <div class=\"col-sm-6\">\n\t    \t<input name=\"cardNumber\" class=\"form-control\" ng-model=\"vm.card.number\" placeholder=\"Card Number\" payments-format=\"card\" payments-validate=\"card\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardExpiration\">Expiration Date</label>\n        <div class=\"col-sm-3\">\n\t    \t<input name=\"cardExpiration\" class=\"form-control\" ng-model=\"vm.card.expiry\" placeholder=\"Expiration\" payments-format=\"expiry\" payments-validate=\"expiry\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardCvv\">Card CVV</label>\n        <div class=\"col-sm-3\">\n\t    \t<input name=\"cardCvc\" class=\"form-control\" ng-model=\"vm.card.cvc\" placeholder=\"CVC\" payments-format=\"cvc\" payments-validate=\"cvc\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <div class=\"col-sm-offset-3 col-sm-9\">\n\t    \t<button type=\"submit\">Submit</button>\n        </div>\n      </div>\n    </fieldset>\n  </form>\n\t<div ng-if=\"checkoutForm.cardNumber.$invalid\">\n    \tError: invalid card number!\n\t</div>\n</div>"
+
+/***/ }),
+/* 64 */
 /*!*********************************!*\
   !*** ./service/dataProvider.js ***!
   \*********************************/
@@ -46323,7 +46445,13 @@
 	        };
 	
 	        var removeProduct = function removeProduct(product) {
-	            var index = cart.indexof(product);
+	            var index = -1;
+	            for (var item in cart) {
+	                index++;
+	                if (cart[item]._id === product._id) {
+	                    break;
+	                }
+	            }
 	            if (index > -1) {
 	                cart.splice(index, 1);
 	            }
@@ -46334,18 +46462,29 @@
 	            return cart;
 	        };
 	
+	        var isProductInCart = function isProductInCart(product) {
+	            debugger;
+	            for (var item in cart) {
+	                if (cart[item]._id === product._id) {
+	                    return true;
+	                }
+	            }
+	            return false;
+	        };
+	
 	        return {
 	            setData: setData,
 	            getData: getData,
 	            addProduct: addProduct,
 	            removeProduct: removeProduct,
-	            getProduct: getProduct
+	            getProduct: getProduct,
+	            isProductInCart: isProductInCart
 	        };
 	    });
 	};
 
 /***/ }),
-/* 61 */
+/* 65 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/
@@ -46374,6 +46513,9 @@
 	        }).state('main.cart', {
 	            url: '/cart',
 	            template: '<cart></cart>'
+	        }).state('main.checkout', {
+	            url: '/checkout',
+	            template: '<checkout></checkout>'
 	        });
 	
 	        $urlRouterProvider.otherwise('/main/home');

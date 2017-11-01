@@ -13,6 +13,7 @@ export default (ngModule) => {
                 const vm = this;
 
                 vm.product = dataprovider.getData();
+                vm.isProductInCart = dataprovider.isProductInCart(vm.product);
 
                 if (!vm.product) {
                 	$location.path("/main/home");
@@ -23,6 +24,15 @@ export default (ngModule) => {
                 	dataprovider.addProduct(vm.product);
                 	$location.path("/main/cart");
                 };
+
+                vm.proceedToCheckout = () => {
+                    $location.path("/main/cart");
+                }
+
+                vm.removeFromCart = () => {
+                    dataprovider.removeProduct(vm.product);
+                    vm.isProductInCart = false;
+                }
             }
         }
     });

@@ -13,6 +13,11 @@ export default (ngModule) => {
                 const vm = this;
 
                 vm.products = dataprovider.getProduct();
+
+                // declare functions needed
+                vm.checkout = () => {
+                    $location.path("/main/checkout");
+                }
             }
     	}
     });

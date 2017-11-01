@@ -16,7 +16,13 @@ export default (ngModule) => {
     	}
 
     	var removeProduct = (product) => {
-    		let index = cart.indexof(product);
+    		let index = -1;
+            for (var item in cart) {
+                index++;
+                if (cart[item]._id === product._id) {
+                    break;
+                }
+            }
     		if (index > -1) {
     			cart.splice(index, 1);
     		}
@@ -27,12 +33,23 @@ export default (ngModule) => {
     		return cart;
     	}
 
+        var isProductInCart = (product) => {
+            debugger;
+            for (var item in cart) {
+                if (cart[item]._id === product._id) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     	return {
     		setData,
     		getData,
     		addProduct,
     		removeProduct,
-    		getProduct 
+    		getProduct,
+            isProductInCart
     	}
     })
 }
