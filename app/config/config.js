@@ -3,5 +3,7 @@ module.exports = {
 	LOGIN: "signin/account",
 	REGISTER: "signup/account",
 	PRODUCT_ALL: "product/all",
-	CHECK_ADMIN: "admin/isadmin"
+	CHECK_ADMIN: "admin/isadmin",
+	CREATE_PRODUCT: "product/create",
+	REMOVE_PRODUCT: "product/remove"
 };

@@ -44285,6 +44285,12 @@
 	                vm.redirectLogin = function () {
 	                    $location.path('/main/login');
 	                };
+	
+	                vm.signout = function () {
+	                    vm.user = null;
+	                    localStorage.removeItem('USER');
+	                    $location.path('/main/login');
+	                };
 	            }
 	        };
 	    });
@@ -44348,7 +44354,7 @@
   \************************/
 /***/ (function(module, exports) {
 
-	module.exports = "<div>\n  <nav class=\"navbar navbar-default\">\n    <div class=\"container-fluid\">\n      <!-- Brand and toggle get grouped for better mobile display -->\n      <div class=\"navbar-header\">\n        <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-1\" aria-expanded=\"false\">\n          <span class=\"sr-only\">Toggle navigation</span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n        </button>\n        <a class=\"navbar-brand\" href=\"#\">Brand</a>\n        <button ng-if=\"!vm.user\" type=\"button\" class=\"btn btn-default navbar-btn\" ng-click=\"vm.redirectLogin()\">Sign in</button>\n        <ul class=\"nav navbar-nav\" ng-if=\"vm.admin\">\n          <li class=\"active\" ng-click=\"admin.addProduct = !admin.addProduct\"><a>Add Product</a></li>\n          <li ng-click=\"admin.addProduct = !admin.addProduct\"><a>Edit Product</a></li>\n        </ul>\n        <p ng-if=\"vm.user.email\" class=\"navbar-text\">Signed in as {{vm.user.email}}</p>\n      </div>\n  </nav>\n  <div ui-view></div>\n  <footer>\n    <p>© 2017<a style=\"color:#0a93a6; text-decoration:none;\" href=\"#\">Fish Skin</a>, All rights reserved 2016-2017.</p>\n    </footer>\n</div>"
+	module.exports = "<div>\n  <nav class=\"navbar navbar-default\">\n    <div class=\"container-fluid\">\n      <!-- Brand and toggle get grouped for better mobile display -->\n      <div class=\"navbar-header\">\n        <button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#bs-example-navbar-collapse-1\" aria-expanded=\"false\">\n          <span class=\"sr-only\">Toggle navigation</span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n          <span class=\"icon-bar\"></span>\n        </button>\n        <a class=\"navbar-brand\" href=\"#\">Brand</a>\n        <button ng-if=\"!vm.user\" type=\"button\" class=\"btn btn-default navbar-btn\" ng-click=\"vm.redirectLogin()\">Sign in</button>\n        <ul class=\"nav navbar-nav\" ng-if=\"vm.admin\">\n          <li class=\"active\" ng-click=\"admin.addProduct = !admin.addProduct\"><a>Add Product</a></li>\n          <li ng-click=\"admin.addProduct = !admin.addProduct\"><a>Edit Product</a></li>\n        </ul>\n        <p ng-if=\"vm.user.email\" class=\"navbar-text\">Signed in as {{vm.user.email}}</p>\n        <ul class=\"nav navbar-nav navbar-right\">\n          <li ng-if=\"vm.user\" ng-click=\"vm.signout()\">\n            <a>Sign out</a>\n          </li>\n        </ul>\n      </div>\n  </nav>\n  <div ui-view></div>\n  <footer>\n    <p>© 2017<a style=\"color:#0a93a6; text-decoration:none;\" href=\"#\">Fish Skin</a>, All rights reserved 2016-2017.</p>\n    </footer>\n</div>"
 
 /***/ }),
 /* 22 */
@@ -47473,7 +47479,9 @@
 		LOGIN: "signin/account",
 		REGISTER: "signup/account",
 		PRODUCT_ALL: "product/all",
-		CHECK_ADMIN: "admin/isadmin"
+		CHECK_ADMIN: "admin/isadmin",
+		CREATE_PRODUCT: "product/create",
+		REMOVE_PRODUCT: "product/remove"
 	};
 
 /***/ }),
@@ -48041,6 +48049,8 @@
 	                $rootScope.admin = {
 	                    addProduct: true
 	                };
+	                vm.product = {};
+	                vm.products = [];
 	
 	                // In case user is not logged in redirect to login page
 	                location.redirect();
@@ -48059,6 +48069,42 @@
 	                        $location.path("/main/product");
 	                    }
 	                });
+	
+	                //************** declare functions here*********
+	                vm.createProduct = function () {
+	                    // split by "/n" into array
+	                    vm.product.productImage = vm.product.productImage.split("\n");
+	                    vm.product.description = vm.product.description.split("\n");
+	                    var body = vm.product;
+	                    service.post("" + config.BASE_URL + config.CREATE_PRODUCT, null, body).then(function (response) {
+	                        alert(JSON.stringify(response.data));
+	                        vm.product = {};
+	                        $scope.$apply();
+	                    }).catch(function (errror) {
+	                        console.error(error.message);
+	                        alert(error.message);
+	                    });
+	                };
+	
+	                vm.getProducts = function () {
+	                    service.get("" + config.BASE_URL + config.PRODUCT_ALL, null).then(function (response) {
+	                        vm.products = response.data;
+	                        $scope.$apply();
+	                    }).catch(function (error) {
+	                        console.error(error.message);
+	                    });
+	                };
+	
+	                vm.getProducts();
+	
+	                vm.removeProduct = function (name) {
+	                    service.post("" + config.BASE_URL + config.REMOVE_PRODUCT, null, { name: name }).then(function (response) {
+	                        vm.getProducts();
+	                    }).catch(function (error) {
+	                        console.error(error.message);
+	                        alert(error.message);
+	                    });
+	                };
 	            }
 	        };
 	    });
@@ -48122,7 +48168,7 @@
   \**************************/
 /***/ (function(module, exports) {
 
-	module.exports = "<div class=\"container\">\n\t<div ng-show=\"admin.addProduct\">\n\t\t<form class=\"form-horizontal\" role=\"form\">\n\t      <legend>Payment</legend>\n\t      <div class=\"form-group\">\n\t        <label class=\"col-sm-3 control-label\" for=\"name\">Name of product</label>\n\t        <div class=\"col-sm-6\">\n\t          <input type=\"text\" class=\"form-control\" name=\"name\" id=\"name\" />\n\t        </div>\n\t      </div>\n\t\t      <div class=\"form-group\">\n\t        <label class=\"col-sm-3 control-label\" for=\"stock\">Stock</label>\n\t        <div class=\"col-sm-6\">\n\t          <input type=\"number\" class=\"form-control\" name=\"stock\" id=\"stock\" />\n\t        </div>\n\t      </div>\n\t      <div class=\"form-group\">\n\t        <label class=\"col-sm-3 control-label\" for=\"price\">Price</label>\n\t        <div class=\"col-sm-6\">\n\t          <input type=\"number\" class=\"form-control\" name=\"price\" id=\"price\" />\n\t        </div>\n\t      </div>\n\t\t      <div class=\"form-group\">\n\t        <label class=\"col-sm-3 control-label\" for=\"description\">Description</label>\n\t        <div class=\"col-sm-6\">\n\t          <textarea type=\"text\" class=\"form-control\" name=\"description\" id=\"description\"></textarea>\n\t        </div>\n\t      </div>\n\t\t      <div class=\"form-group\">\n\t        <label class=\"col-sm-3 control-label\" for=\"image\">Image</label>\n\t        <div class=\"col-sm-6\">\n\t          <input type=\"url\" class=\"form-control\" name=\"image\" id=\"image\" />\n\t        </div>\n\t      </div>\n\t      <div class=\"form-group\">\n\t        <label class=\"col-sm-3 control-label\" for=\"discount\">Discount price</label>\n\t        <div class=\"col-sm-6\">\n\t          <input type=\"number\" placeholder=\"Optional\" class=\"form-control\" name=\"discount\" id=\"discount\" />\n\t        </div>\n\t      </div>\n\t       </div>\n\t      <div class=\"form-group\">\n\t        <div class=\"col-sm-offset-3 col-sm-9\">\n\t\t    \t<button type=\"submit\" class=\"btn btn-success\">Submit</button>\n\t        </div>\n\t      </div>\n\t\t</form>\n\t</div>\n\t<div ng-hide=\"admin.editProduct\">\n\t</div>\n</div>"
+	module.exports = "<div class=\"container\" style=\"margin-bottom: 50px\">\n\t<div ng-if=\"admin.addProduct\">\n\t\t<form name=\"productForm\" class=\"form-horizontal\" role=\"form\">\n\t      <legend>Payment</legend>\n\t      <div class=\"form-group\">\n\t        <label class=\"col-sm-3 control-label\" for=\"name\">Name of product</label>\n\t        <div class=\"col-sm-6\">\n\t          <input required type=\"text\" class=\"form-control\" name=\"name\" id=\"name\" ng-model=\"vm.product.name\" />\n\t        </div>\n\t      </div>\n\t\t      <div class=\"form-group\">\n\t        <label class=\"col-sm-3 control-label\" for=\"stock\">Stock</label>\n\t        <div class=\"col-sm-6\">\n\t          <input required type=\"number\" class=\"form-control\" name=\"stock\" id=\"stock\" ng-model=\"vm.product.stock\" />\n\t        </div>\n\t      </div>\n\t      <div class=\"form-group\">\n\t        <label class=\"col-sm-3 control-label\" for=\"price\">Price</label>\n\t        <div class=\"col-sm-6\">\n\t          <input required type=\"number\" class=\"form-control\" name=\"price\" id=\"price\" ng-model=\"vm.product.price\" />\n\t        </div>\n\t      </div>\n\t\t      <div class=\"form-group\">\n\t        <label class=\"col-sm-3 control-label\" for=\"description\">Description</label>\n\t        <div class=\"col-sm-6\">\n\t          <textarea required type=\"text\" class=\"form-control\" name=\"description\" id=\"description\" ng-model=\"vm.product.description\"></textarea>\n\t        </div>\n\t      </div>\n\t\t      <div class=\"form-group\">\n\t        <label class=\"col-sm-3 control-label\" for=\"image\">Image</label>\n\t        <div class=\"col-sm-6\">\n\t          <input required type=\"url\" class=\"form-control\" name=\"image\" id=\"image\" ng-model=\"vm.product.productImage\" />\n\t        </div>\n\t      </div>\n\t      <div class=\"form-group\">\n\t        <label class=\"col-sm-3 control-label\" for=\"discount\">Discount price</label>\n\t        <div class=\"col-sm-6\">\n\t          <input type=\"number\" placeholder=\"Optional\" class=\"form-control\" name=\"discount\" id=\"discount\" ng-model=\"vm.product.discountPrice\" />\n\t        </div>\n\t      </div>\n\t      <div class=\"form-group\">\n\t        <div class=\"col-sm-offset-3 col-sm-9\">\n\t\t    \t<button ng-disabled=\"productForm.$invalid\" type=\"submit\" class=\"btn btn-success\" ng-click=\"vm.createProduct()\">Submit</button>\n\t        </div>\n\t      </div>\n\t\t</form>\n\t</div>\n\t<div ng-if=\"!admin.addProduct\">\n\t\t<div class=\"card\" ng-repeat=\"product in vm.products\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-sm-4\">\n\t\t\t\t\t<img class=\"w-100\" style=\"width: 100px; height: 100px\" ng-src=\"{{product.productImage[0]}}\">\n\t\t\t\t</div>\n\t\t\t\t<div class=\"col-sm-8 px-3\">\n\t\t\t\t\t<div class=\"card-block px-3\">\n\t\t\t\t\t\t<h4 class=\"card-title\">{{product.name}}</h4>\n\t\t\t\t\t\t<p class=\"card-text\">{{product.description[0]}}</p>\n\t\t\t\t\t\t<a class=\"btn btn-primary\">Remove product</a>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</div>"
 
 /***/ }),
 /* 69 */

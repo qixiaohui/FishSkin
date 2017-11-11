@@ -15,6 +15,8 @@ export default (ngModule) => {
                 $rootScope.admin = {
                     addProduct: true
                 };
+                vm.product = {};
+                vm.products = [];
 
                 // In case user is not logged in redirect to login page
                 location.redirect();
@@ -35,7 +37,41 @@ export default (ngModule) => {
                 });
 
 
-                
+                //************** declare functions here*********
+                vm.createProduct = () => {
+                    // split by "/n" into array
+                    vm.product.productImage = vm.product.productImage.split("\n");
+                    vm.product.description = vm.product.description.split("\n");
+                    var body = vm.product;
+                    service.post(`${config.BASE_URL}${config.CREATE_PRODUCT}`, null, body).then((response) => {
+                        alert(JSON.stringify(response.data));
+                        vm.product = {};
+                        $scope.$apply();
+                    }).catch((errror) => {
+                        console.error(error.message);
+                        alert(error.message);
+                    });
+                }
+
+                vm.getProducts = () => {
+                    service.get(`${config.BASE_URL}${config.PRODUCT_ALL}`, null).then((response) => {
+                        vm.products = response.data;
+                        $scope.$apply();
+                    }).catch((error) => {
+                        console.error(error.message);
+                    });
+                }
+
+                vm.getProducts();
+
+                vm.removeProduct = (name) => {
+                    service.post(`${config.BASE_URL}${config.REMOVE_PRODUCT}`, null, {name: name}).then((response) => {
+                        vm.getProducts();
+                    }).catch((error) => {
+                        console.error(error.message);
+                        alert(error.message);
+                    });
+                }
             }
         }
     });

@@ -40,5 +40,14 @@ module.exports = (passport) => {
 		});
 	});
 
+	router.post("/remove", passport.authenticate('jwt', { session: false }), (request, response) => {
+		Product.deleteOne({name: request.body.name}, (error) => {
+			if (error) {
+				return response.status(400).send({message: error});
+			}
+			response.status(200).send({message: "success"});
+		});
+	})
+
 	return router;
 };

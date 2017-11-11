@@ -1,51 +1,64 @@
-<div class="container">
-	<div ng-show="admin.addProduct">
-		<form class="form-horizontal" role="form">
+<div class="container" style="margin-bottom: 50px">
+	<div ng-if="admin.addProduct">
+		<form name="productForm" class="form-horizontal" role="form">
 	      <legend>Payment</legend>
 	      <div class="form-group">
 	        <label class="col-sm-3 control-label" for="name">Name of product</label>
 	        <div class="col-sm-6">
-	          <input type="text" class="form-control" name="name" id="name" />
+	          <input required type="text" class="form-control" name="name" id="name" ng-model="vm.product.name" />
 	        </div>
 	      </div>
 		      <div class="form-group">
 	        <label class="col-sm-3 control-label" for="stock">Stock</label>
 	        <div class="col-sm-6">
-	          <input type="number" class="form-control" name="stock" id="stock" />
+	          <input required type="number" class="form-control" name="stock" id="stock" ng-model="vm.product.stock" />
 	        </div>
 	      </div>
 	      <div class="form-group">
 	        <label class="col-sm-3 control-label" for="price">Price</label>
 	        <div class="col-sm-6">
-	          <input type="number" class="form-control" name="price" id="price" />
+	          <input required type="number" class="form-control" name="price" id="price" ng-model="vm.product.price" />
 	        </div>
 	      </div>
 		      <div class="form-group">
 	        <label class="col-sm-3 control-label" for="description">Description</label>
 	        <div class="col-sm-6">
-	          <textarea type="text" class="form-control" name="description" id="description"></textarea>
+	          <textarea required type="text" class="form-control" name="description" id="description" ng-model="vm.product.description"></textarea>
 	        </div>
 	      </div>
 		      <div class="form-group">
 	        <label class="col-sm-3 control-label" for="image">Image</label>
 	        <div class="col-sm-6">
-	          <input type="url" class="form-control" name="image" id="image" />
+	          <input required type="url" class="form-control" name="image" id="image" ng-model="vm.product.productImage" />
 	        </div>
 	      </div>
 	      <div class="form-group">
 	        <label class="col-sm-3 control-label" for="discount">Discount price</label>
 	        <div class="col-sm-6">
-	          <input type="number" placeholder="Optional" class="form-control" name="discount" id="discount" />
+	          <input type="number" placeholder="Optional" class="form-control" name="discount" id="discount" ng-model="vm.product.discountPrice" />
 	        </div>
 	      </div>
-	       </div>
 	      <div class="form-group">
 	        <div class="col-sm-offset-3 col-sm-9">
-		    	<button type="submit" class="btn btn-success">Submit</button>
+		    	<button ng-disabled="productForm.$invalid" type="submit" class="btn btn-success" ng-click="vm.createProduct()">Submit</button>
 	        </div>
 	      </div>
 		</form>
 	</div>
-	<div ng-hide="admin.editProduct">
+	<div ng-if="!admin.addProduct">
+		<div class="card" ng-repeat="product in vm.products">
+			<div class="row">
+				<div class="col-sm-4">
+					<img class="w-100" style="width: 100px; height: 100px" ng-src="{{product.productImage[0]}}">
+				</div>
+				<div class="col-sm-8 px-3">
+					<div class="card-block px-3">
+						<h4 class="card-title">{{product.name}}</h4>
+						<p class="card-text">{{product.description[0]}}</p>
+						<a class="btn btn-primary">Remove product</a>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>

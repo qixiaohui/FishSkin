@@ -35,6 +35,12 @@ export default (ngModule) => {
             	vm.redirectLogin = () => {
             		$location.path('/main/login');
             	};
+
+                vm.signout = () => {
+                    vm.user = null;
+                    localStorage.removeItem('USER');
+                    $location.path('/main/login');
+                }
             }
         }
     });

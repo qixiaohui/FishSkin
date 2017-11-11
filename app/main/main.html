@@ -16,6 +16,11 @@
           <li ng-click="admin.addProduct = !admin.addProduct"><a>Edit Product</a></li>
         </ul>
         <p ng-if="vm.user.email" class="navbar-text">Signed in as {{vm.user.email}}</p>
+        <ul class="nav navbar-nav navbar-right">
+          <li ng-if="vm.user" ng-click="vm.signout()">
+            <a>Sign out</a>
+          </li>
+        </ul>
       </div>
   </nav>
   <div ui-view></div>
