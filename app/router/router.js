@@ -31,6 +31,11 @@ export default ngModule => {
                 url: '/checkout',
                 template: '<checkout></checkout>'
             }
+        ).state(
+            'main.admin', {
+                url: '/admin',
+                template: '<admin></admin>'
+            }
         );
 
         $urlRouterProvider.otherwise('/main/home');

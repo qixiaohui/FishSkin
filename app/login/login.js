@@ -65,8 +65,8 @@ export default (ngModule) => {
                             vm.errorMessage = response.data.message;
                             return;
                         }
-                        cacheUser(response.data.email, response.data.token);
-                        $scope.$emit("LOGIN", response.data.email);
+                        cacheUser(response.data.user.email, response.data.token);
+                        $scope.$emit("LOGIN", response.data.user);
                         $location.path('/main/home');
                         $scope.$apply();
                 };

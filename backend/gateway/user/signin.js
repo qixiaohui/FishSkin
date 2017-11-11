@@ -22,7 +22,7 @@ module.exports = (passport) => {
 					if (match && !error) {
 						// If user found, password match then generate jwt token
 						const token = jwt.sign({data: JSON.stringify(user)}, config.secret);
-						return response.json({status: 200, token: "JWT " + token, email: user.email});
+						return response.json({status: 200, token: "JWT " + token, user});
 					} else {
 						return response.status(401).send({status: 400, message: "Wrong password"});
 					}

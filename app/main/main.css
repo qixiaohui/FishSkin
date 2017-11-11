@@ -1,10 +1,35 @@
 body {
 	height: 100vh !important;
+  background-color: #fafafa;
 }
 
-.footer {
+/* Footer */
+
+footer{
+   background-color: #424558;
     position: fixed;
-    left: 0;
     bottom: 0;
-    width: 100%;
+    left: 0;
+    right: 0;
+    height: 35px;
+    text-align: center;
+    color: #CCC;
+}
+
+footer p {
+    padding: 10.5px;
+    margin: 0px;
+    line-height: 100%;
+}
+
+body {
+  font-family: 'open sans';
+  overflow-x: hidden; }
+
+img {
+  max-width: 100%; 
+}
+
+.container {
+  background-color: #fafafa;
 }

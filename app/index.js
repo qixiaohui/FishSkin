@@ -12,8 +12,10 @@ require('./login/login').default(app);
 require('./product/product').default(app);
 require('./cart/cart').default(app);
 require('./checkout/checkout').default(app);
+require('./admin/admin').default(app);
 require('./service/dataProvider').default(app);
+require('./service/location').default(app);
 
 require('./router/router').default(app);
 
-Stripe.setPublishableKey('fillMePlease')
+Stripe.setPublishableKey('pk_test_G1tVmozuUQggIp4jBjIFO28u')

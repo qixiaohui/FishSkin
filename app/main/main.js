@@ -10,6 +10,15 @@ export default (ngModule) => {
             	const vm = this;
 
             	vm.user = null;
+                vm.admin = false;
+                $scope.$on('$stateChangeSuccess', () => {
+                    if ($location.path().indexOf("admin") > -1) {
+                        vm.admin = true;
+                    } else {
+                        vm.admin = false;
+                    }
+                });
+
             	// Called on initialization
             	if (localStorage.getItem("USER")) {
             		vm.user = JSON.parse(localStorage.getItem("USER"));
@@ -17,7 +26,7 @@ export default (ngModule) => {
             		// listen to login event
             		$scope.$on("LOGIN", (event, user) => {
             			vm.user = {};
-            			vm.user.email = user;
+            			vm.user.email = user.email;
             		});
             	}
 

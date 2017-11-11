@@ -11,13 +11,15 @@
         </button>
         <a class="navbar-brand" href="#">Brand</a>
         <button ng-if="!vm.user" type="button" class="btn btn-default navbar-btn" ng-click="vm.redirectLogin()">Sign in</button>
+        <ul class="nav navbar-nav" ng-if="vm.admin">
+          <li class="active" ng-click="admin.addProduct = !admin.addProduct"><a>Add Product</a></li>
+          <li ng-click="admin.addProduct = !admin.addProduct"><a>Edit Product</a></li>
+        </ul>
         <p ng-if="vm.user.email" class="navbar-text">Signed in as {{vm.user.email}}</p>
       </div>
   </nav>
   <div ui-view></div>
-  <div class="footer">
-    <div class="container">
-      <span>Dog cake</span>
-    </div>
-  </div>
+  <footer>
+    <p>© 2017<a style="color:#0a93a6; text-decoration:none;" href="#">Fish Skin</a>, All rights reserved 2016-2017.</p>
+    </footer>
 </div>

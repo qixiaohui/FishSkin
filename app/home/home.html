@@ -1,7 +1,24 @@
-<div class="container">
-	<div class="wrapper row">
-		<div class="card col-md-2 col-sm-2 col-xs-3" style="width: 350px;" ng-repeat="product in vm.products">
-		  <img class="card-img-top" ng-src="{{product.productImage[0]}}" alt="Card image" style="max-width: 300px; width: 300px; height: 300px">
+<div class="container" style="margin-bottom: 50px">
+	<div class="row mb-5">
+        <div class="col-sm-6 col-md-4 col-lg-3 mt-4" ng-repeat="product in vm.products">
+            <div class="card" style="margin-top: 20px; margin-bottom: 20px">
+                <img class="card-img-top" src="{{product.productImage[0]}}">
+                <div class="card-block">
+                    <h4 class="card-title mt-3">{{product.name | limitTo: 20}}</h4>
+                    <div class="meta">
+                        <a>${{product.price}}</a>
+                    </div>
+                    <div class="card-text">
+                        {{product.description[0] | limitTo: 20}}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button ng-click="vm.seeDetail(product)" class="btn btn-info btn-sm">See detail</button>
+                </div>
+            </div>
+        </div>
+	</div>
+<!-- 		  <img class="card-img-top" ng-src="{{product.productImage[0]}}" alt="Card image" style="max-width: 300px; width: 300px; height: 300px">
 		  <div class="card-block">
 		    <h4 class="card-title" style="padding-left: 10px">
 		    	{{product.name}}
@@ -12,7 +29,5 @@
 		    	{{product.description[0]}}
 		    </p>
 		    <a ng-click="vm.seeDetail(product)" class="btn btn-primary">See details</a>
-		  </div>
-		</div>
-	</div>
+		  </div> -->
 </div>

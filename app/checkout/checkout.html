@@ -1,6 +1,5 @@
 <div class="container">
   <form class="form-horizontal" stripe-form="vm.stripeCallback" role="form">
-    <fieldset>
       <legend>Payment</legend>
       <div class="form-group">
         <label class="col-sm-3 control-label" for="card-holder-name">Name on Card</label>
@@ -17,6 +16,8 @@
       <div class="form-group">
         <label class="col-sm-3 control-label" for="cardExpiration">Expiration Date</label>
         <div class="col-sm-3">
+          	<input type="hidden" name="cardExpMonth" value="" data-stripe="exp_month">
+  			<input type="hidden" name="cardExpYear" value=""data-stripe="exp_year">
 	    	<input name="cardExpiration" class="form-control" ng-model="vm.card.expiry" placeholder="Expiration" payments-format="expiry" payments-validate="expiry" />
         </div>
       </div>
@@ -27,11 +28,10 @@
         </div>
       </div>
       <div class="form-group">
-        <div class="col-sm-offset-3 col-sm-9">
-	    	<button type="submit">Submit</button>
+        <div class="col-sm-offset-3 col-sm-6">
+	    	<button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-credit-card"></span> Submit</button>
         </div>
       </div>
-    </fieldset>
   </form>
 	<div ng-if="checkoutForm.cardNumber.$invalid">
     	Error: invalid card number!
