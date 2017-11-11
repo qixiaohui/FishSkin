@@ -78,8 +78,9 @@
 	__webpack_require__(/*! ./admin/admin */ 65).default(app);
 	__webpack_require__(/*! ./service/dataProvider */ 69).default(app);
 	__webpack_require__(/*! ./service/location */ 70).default(app);
+	__webpack_require__(/*! ./service/filter */ 71).default(app);
 	
-	__webpack_require__(/*! ./router/router */ 71).default(app);
+	__webpack_require__(/*! ./router/router */ 72).default(app);
 	
 	Stripe.setPublishableKey('pk_test_G1tVmozuUQggIp4jBjIFO28u');
 
@@ -47843,6 +47844,30 @@
 	                vm.checkout = function () {
 	                    $location.path("/main/checkout");
 	                };
+	
+	                //********** declare functions needed **********
+	                vm.redirectHome = function () {
+	                    if (!vm.products || vm.products instanceof Array && vm.products.length == 0) {
+	                        $location.path("/main/home");
+	                    }
+	                };
+	
+	                vm.redirectHome();
+	
+	                vm.removeFromCart = function (product) {
+	                    vm.products = dataprovider.removeProduct(product);
+	                    // Check if current cart is empty, if so redirect to home page
+	                    vm.redirectHome();
+	                };
+	
+	                vm.getTotal = function () {
+	                    var total = 0;
+	                    for (var i = 0; i < vm.products.length; i++) {
+	                        var product = vm.products[i];
+	                        total += product.quantity * product.price;
+	                    }
+	                    return total;
+	                };
 	            }
 	        };
 	    });
@@ -47906,7 +47931,7 @@
   \************************/
 /***/ (function(module, exports) {
 
-	module.exports = "<div class=\"container\">\n\t<table id=\"cart\" class=\"table table-hover table-condensed\">\n\t\t<thead>\n\t\t\t<tr>\n\t\t\t\t<th style=\"width:50%\">Product</th>\n\t\t\t\t<th style=\"width:10%\">Price</th>\n\t\t\t\t<th style=\"width:8%\">Quantity</th>\n\t\t\t\t<th style=\"width:22%\" class=\"text-center\">Subtotal</th>\n\t\t\t\t<th style=\"width:10%\"></th>\n\t\t\t</tr>\n\t\t</thead>\n\t\t<tbody>\n\t\t\t<tr ng-repeat=\"product in vm.products\">\n\t\t\t\t<td data-th=\"Product\">\n\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t<div class=\"col-sm-2 hidden-xs\"><img src=\"{{product.productImage[0]}}\" alt=\"...\" class=\"img-responsive\"/></div>\n\t\t\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t\t\t<h4 class=\"nomargin\">{{product.name}}</h4>\n\t\t\t\t\t\t\t<p>{{product.description[0]}}</p>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</td>\n\t\t\t\t<td data-th=\"Price\">${{product.price}}</td>\n\t\t\t\t<td data-th=\"Quantity\">\n\t\t\t\t\t<input type=\"number\" class=\"form-control text-center\" value=\"1\">\n\t\t\t\t\t<p>{{product.stock}} in stock</p>\n\t\t\t\t</td>\n\t\t\t\t<td data-th=\"Subtotal\" class=\"text-center\">{{product.price}}</td>\n\t\t\t\t<td class=\"actions\" data-th=\"\">\n\t\t\t\t\t<button class=\"btn btn-info btn-sm\"><i class=\"fa fa-refresh\"></i></button>\n\t\t\t\t\t<button class=\"btn btn-danger btn-sm\"><i class=\"fa fa-trash-o\"></i></button>\t\t\t\t\t\t\t\t\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody>\n\t\t<tfoot>\n\t\t\t<tr class=\"visible-xs\">\n\t\t\t\t<td class=\"text-center\"><strong>Total 1.99</strong></td>\n\t\t\t</tr>\n\t\t\t<tr>\n\t\t\t\t<td><a href=\"#\" class=\"btn btn-warning\"><i class=\"fa fa-angle-left\"></i> Continue Shopping</a></td>\n\t\t\t\t<td colspan=\"2\" class=\"hidden-xs\"></td>\n\t\t\t\t<td class=\"hidden-xs text-center\"><strong>Total $1.99</strong></td>\n\t\t\t\t<td><a ng-click=\"vm.checkout()\" class=\"btn btn-success btn-block\">Checkout <i class=\"fa fa-angle-right\"></i></a></td>\n\t\t\t</tr>\n\t\t</tfoot>\n\t</table>\n</div>"
+	module.exports = "<div class=\"container\">\n\t<table id=\"cart\" class=\"table table-hover table-condensed\">\n\t\t<thead>\n\t\t\t<tr>\n\t\t\t\t<th style=\"width:50%\">Product</th>\n\t\t\t\t<th style=\"width:10%\">Price</th>\n\t\t\t\t<th style=\"width:8%\">Quantity</th>\n\t\t\t\t<th style=\"width:22%\" class=\"text-center\">Subtotal</th>\n\t\t\t\t<th style=\"width:10%\"></th>\n\t\t\t</tr>\n\t\t</thead>\n\t\t<tbody>\n\t\t\t<tr ng-repeat=\"product in vm.products\">\n\t\t\t\t<td data-th=\"Product\">\n\t\t\t\t\t<div class=\"row\">\n\t\t\t\t\t\t<div class=\"col-sm-2 hidden-xs\"><img src=\"{{product.productImage[0]}}\" alt=\"...\" class=\"img-responsive\"/></div>\n\t\t\t\t\t\t<div class=\"col-sm-10\">\n\t\t\t\t\t\t\t<h4 class=\"nomargin\">{{product.name}}</h4>\n\t\t\t\t\t\t\t<p>{{product.description[0]}}</p>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</td>\n\t\t\t\t<td data-th=\"Price\">${{product.price}}</td>\n\t\t\t\t<td data-th=\"Quantity\">\n\t\t\t\t\t<input type=\"number\" class=\"form-control text-center\" min=\"1\" ng-max=\"{{product.stock}}\" ng-init=\"product.quantity=1\" ng-model=\"product.quantity\" limit-to-max />\n\t\t\t\t\t<p>{{product.stock - product.quantity}} in stock</p>\n\t\t\t\t</td>\n\t\t\t\t<td data-th=\"Subtotal\" class=\"text-center\">{{product.price}}</td>\n\t\t\t\t<td class=\"actions\" data-th=\"\">\n\t\t\t\t\t<button class=\"btn btn-info btn-block\" ng-click=\"vm.removeFromCart(product)\">Remove</button>\t\t\t\t\t\t\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody>\n\t\t<tfoot>\n\t\t\t<tr class=\"visible-xs\">\n\t\t\t\t<td class=\"text-center\"><strong>Total ${{vm.getTotal()}}</strong></td>\n\t\t\t</tr>\n\t\t\t<tr>\n\t\t\t\t<td><a href=\"#\" class=\"btn btn-warning\"><i class=\"fa fa-angle-left\"></i> Continue Shopping</a></td>\n\t\t\t\t<td colspan=\"2\" class=\"hidden-xs\"></td>\n\t\t\t\t<td class=\"hidden-xs text-center\"><strong>Total ${{vm.getTotal()}}</strong></td>\n\t\t\t\t<td><a ng-click=\"vm.checkout()\" class=\"btn btn-success btn-block\">Checkout <i class=\"fa fa-angle-right\"></i></a></td>\n\t\t\t</tr>\n\t\t</tfoot>\n\t</table>\n</div>"
 
 /***/ }),
 /* 61 */
@@ -48268,6 +48293,39 @@
 
 /***/ }),
 /* 71 */
+/*!***************************!*\
+  !*** ./service/filter.js ***!
+  \***************************/
+/***/ (function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	exports.default = function (ngModule) {
+		ngModule.directive("limitToMax", function () {
+			return {
+				link: function link(scope, element, attributes) {
+					var oldVal = null;
+					element.on("keydown keyup", function (e) {
+						if (Number(element.val()) > Number(attributes.max) && e.keyCode != 46 // delete
+						&& e.keyCode != 8 // backspace
+						) {
+								e.preventDefault();
+								element.val(oldVal);
+							} else {
+							oldVal = Number(element.val());
+						}
+					});
+				}
+			};
+		});
+	};
+
+/***/ }),
+/* 72 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/

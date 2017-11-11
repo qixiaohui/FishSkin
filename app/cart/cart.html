@@ -22,24 +22,23 @@
 				</td>
 				<td data-th="Price">${{product.price}}</td>
 				<td data-th="Quantity">
-					<input type="number" class="form-control text-center" value="1">
-					<p>{{product.stock}} in stock</p>
+					<input type="number" class="form-control text-center" min="1" ng-max="{{product.stock}}" ng-init="product.quantity=1" ng-model="product.quantity" limit-to-max />
+					<p>{{product.stock - product.quantity}} in stock</p>
 				</td>
 				<td data-th="Subtotal" class="text-center">{{product.price}}</td>
 				<td class="actions" data-th="">
-					<button class="btn btn-info btn-sm"><i class="fa fa-refresh"></i></button>
-					<button class="btn btn-danger btn-sm"><i class="fa fa-trash-o"></i></button>								
+					<button class="btn btn-info btn-block" ng-click="vm.removeFromCart(product)">Remove</button>						
 				</td>
 			</tr>
 		</tbody>
 		<tfoot>
 			<tr class="visible-xs">
-				<td class="text-center"><strong>Total 1.99</strong></td>
+				<td class="text-center"><strong>Total ${{vm.getTotal()}}</strong></td>
 			</tr>
 			<tr>
 				<td><a href="#" class="btn btn-warning"><i class="fa fa-angle-left"></i> Continue Shopping</a></td>
 				<td colspan="2" class="hidden-xs"></td>
-				<td class="hidden-xs text-center"><strong>Total $1.99</strong></td>
+				<td class="hidden-xs text-center"><strong>Total ${{vm.getTotal()}}</strong></td>
 				<td><a ng-click="vm.checkout()" class="btn btn-success btn-block">Checkout <i class="fa fa-angle-right"></i></a></td>
 			</tr>
 		</tfoot>

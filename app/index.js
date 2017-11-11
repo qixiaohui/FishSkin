@@ -15,6 +15,7 @@ require('./checkout/checkout').default(app);
 require('./admin/admin').default(app);
 require('./service/dataProvider').default(app);
 require('./service/location').default(app);
+require('./service/filter').default(app);
 
 require('./router/router').default(app);
 
