@@ -1,3 +1,5 @@
+'use strict'
+
 const service = require("../service/service");
 const config = require("../config/config");
 const axios = require("axios");
@@ -23,7 +25,6 @@ export default (ngModule) => {
                 };
 
                 vm.getToken = () => {
-                	debugger;
                 	Stripe.card.createToken({
                 		number: vm.card.number,
                 		exp_month: vm.card.expiry.split("/")[0],
@@ -31,8 +32,22 @@ export default (ngModule) => {
                 		cvc: vm.card.cvc
                 	}, (status, response) => {
                 		if (status == 200) {
-                			alert(response.card.id);
+                			// After getting the token from stripe
+                			// Call /charge api to charge the 
+                			var body = {
+                				amount: 100,
+                				currency: "usd",
+                				token: response.id,
+                				description: ""
+                			};
+                			service.post(`${config.BASE_URL}${config.BILLING}`, null, body).then((response) => {
+                				$location.path("/main/success");
+                			}).catch((error) => {
+                				console.error(error.message);
+                				alert(error.message);
+                			});
                 		} else {
+                			console.error(response.error.message);
                 			alert(response.error.message);
                 		}
                 	});

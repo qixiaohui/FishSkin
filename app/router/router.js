@@ -36,6 +36,11 @@ export default ngModule => {
                 url: '/admin',
                 template: '<admin></admin>'
             }
+        ).state(
+            'main.success', {
+                url: '/success',
+                template: '<success></success>'
+            }
         );
 
         $urlRouterProvider.otherwise('/main/home');

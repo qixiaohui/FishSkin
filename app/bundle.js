@@ -76,11 +76,12 @@
 	__webpack_require__(/*! ./cart/cart */ 57).default(app);
 	__webpack_require__(/*! ./checkout/checkout */ 61).default(app);
 	__webpack_require__(/*! ./admin/admin */ 65).default(app);
-	__webpack_require__(/*! ./service/dataProvider */ 69).default(app);
-	__webpack_require__(/*! ./service/location */ 70).default(app);
-	__webpack_require__(/*! ./service/filter */ 71).default(app);
+	__webpack_require__(/*! ./success/success */ 69).default(app);
+	__webpack_require__(/*! ./service/dataProvider */ 73).default(app);
+	__webpack_require__(/*! ./service/location */ 74).default(app);
+	__webpack_require__(/*! ./service/filter */ 75).default(app);
 	
-	__webpack_require__(/*! ./router/router */ 72).default(app);
+	__webpack_require__(/*! ./router/router */ 76).default(app);
 	
 	Stripe.setPublishableKey('pk_test_G1tVmozuUQggIp4jBjIFO28u');
 
@@ -47482,7 +47483,8 @@
 		PRODUCT_ALL: "product/all",
 		CHECK_ADMIN: "admin/isadmin",
 		CREATE_PRODUCT: "product/create",
-		REMOVE_PRODUCT: "product/remove"
+		REMOVE_PRODUCT: "product/remove",
+		BILLING: "stripe/charge"
 	};
 
 /***/ }),
@@ -47940,7 +47942,7 @@
   \******************************/
 /***/ (function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -47970,7 +47972,6 @@
 	                };
 	
 	                vm.getToken = function () {
-	                    debugger;
 	                    Stripe.card.createToken({
 	                        number: vm.card.number,
 	                        exp_month: vm.card.expiry.split("/")[0],
@@ -47978,8 +47979,22 @@
 	                        cvc: vm.card.cvc
 	                    }, function (status, response) {
 	                        if (status == 200) {
-	                            alert(response.card.id);
+	                            // After getting the token from stripe
+	                            // Call /charge api to charge the 
+	                            var body = {
+	                                amount: 100,
+	                                currency: "usd",
+	                                token: response.id,
+	                                description: ""
+	                            };
+	                            service.post("" + config.BASE_URL + config.BILLING, null, body).then(function (response) {
+	                                $location.path("/main/success");
+	                            }).catch(function (error) {
+	                                console.error(error.message);
+	                                alert(error.message);
+	                            });
 	                        } else {
+	                            console.error(response.error.message);
 	                            alert(response.error.message);
 	                        }
 	                    });
@@ -48214,6 +48229,100 @@
 
 /***/ }),
 /* 69 */
+/*!****************************!*\
+  !*** ./success/success.js ***!
+  \****************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var service = __webpack_require__(/*! ../service/service */ 23);
+	var config = __webpack_require__(/*! ../config/config */ 45);
+	
+	exports.default = function (ngModule) {
+	    ngModule.directive("success", function () {
+	        __webpack_require__(/*! ./success.css */ 70);
+	        return {
+	            restrict: "E",
+	            scope: true,
+	            template: __webpack_require__(/*! ./success.html */ 72),
+	            controllerAs: "vm",
+	            controller: function controller($rootScope, $location, $scope, $timeout, dataprovider, location) {
+	                var vm = this;
+	
+	                vm.continueShopping = function () {
+	                    $location.path("/main/home");
+	                };
+	            }
+	        };
+	    });
+	};
+
+/***/ }),
+/* 70 */
+/*!*****************************!*\
+  !*** ./success/success.css ***!
+  \*****************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !../../~/css-loader!./success.css */ 71);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// Prepare cssTransformation
+	var transform;
+	
+	var options = {"hmr":true}
+	options.transform = transform
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ../../~/style-loader/lib/addStyles.js */ 9)(content, options);
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../node_modules/css-loader/index.js!./success.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js!./success.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ }),
+/* 71 */
+/*!*********************************************!*\
+  !*** ../~/css-loader!./success/success.css ***!
+  \*********************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ../../~/css-loader/lib/css-base.js */ 3)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "", ""]);
+	
+	// exports
+
+
+/***/ }),
+/* 72 */
+/*!******************************!*\
+  !*** ./success/success.html ***!
+  \******************************/
+/***/ (function(module, exports) {
+
+	module.exports = "<div class=\"container\">\n\t<div class=\"row text-center\">\n        <div class=\"col-sm-6 col-sm-offset-3\">\n        <br><br> <h2 style=\"color:#0fad00\">Success</h2>\n        <img src=\"http://osmhotels.com//assets/check-true.jpg\">\n        <h3>Dear, Faisal khan</h3>\n        <p style=\"font-size:20px;color:#5C5C5C;\">Thank you for verifying your Mobile No.We have sent you an email \"faisalkhan.chat@gmail.com\" with your details\nPlease go to your above email now and login.</p>\n        <a ng-click=\"vm.continueShopping()\" class=\"btn btn-success\">Continue shopping</a>\n    <br><br>\n        </div>\n        \n\t</div>\n</div>"
+
+/***/ }),
+/* 73 */
 /*!*********************************!*\
   !*** ./service/dataProvider.js ***!
   \*********************************/
@@ -48282,7 +48391,7 @@
 	};
 
 /***/ }),
-/* 70 */
+/* 74 */
 /*!*****************************!*\
   !*** ./service/location.js ***!
   \*****************************/
@@ -48309,7 +48418,7 @@
 	};
 
 /***/ }),
-/* 71 */
+/* 75 */
 /*!***************************!*\
   !*** ./service/filter.js ***!
   \***************************/
@@ -48340,7 +48449,7 @@
 	};
 
 /***/ }),
-/* 72 */
+/* 76 */
 /*!**************************!*\
   !*** ./router/router.js ***!
   \**************************/
@@ -48375,6 +48484,9 @@
 	        }).state('main.admin', {
 	            url: '/admin',
 	            template: '<admin></admin>'
+	        }).state('main.success', {
+	            url: '/success',
+	            template: '<success></success>'
 	        });
 	
 	        $urlRouterProvider.otherwise('/main/home');

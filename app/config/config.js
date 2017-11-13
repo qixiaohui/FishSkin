@@ -5,5 +5,6 @@ module.exports = {
 	PRODUCT_ALL: "product/all",
 	CHECK_ADMIN: "admin/isadmin",
 	CREATE_PRODUCT: "product/create",
-	REMOVE_PRODUCT: "product/remove"
+	REMOVE_PRODUCT: "product/remove",
+	BILLING: "stripe/charge"
 };

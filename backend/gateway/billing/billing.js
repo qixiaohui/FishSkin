@@ -10,13 +10,12 @@ const stripe = require("stripe")(secretKey);
 
 module.exports = (passport) => {
 	router.post("/charge", (request, response) => {
-		let token = req.body.id;
 
 		let charge = stripe.charges.create({
-			amount: 1000,
+			amount: request.body.amount,
 			currency: "usd",
-			card: token,
-			description: "qixiaohuihaha@gmail.com",
+			source: request.body.token,
+			description: request.body.productId
 		}, (error, charge) => {
 			if (error) {
 				console.error(error.message);
@@ -26,9 +25,7 @@ module.exports = (passport) => {
 				return;
 			}
 
-			response.status(200).send({
-				message: "success"
-			});
+			response.status(200).send(charge);
 		});
 	});
 
