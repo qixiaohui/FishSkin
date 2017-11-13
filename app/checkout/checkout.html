@@ -1,35 +1,33 @@
 <div class="container">
-  <form class="form-horizontal" stripe-form="vm.stripeCallback" role="form">
+  <form class="form-horizontal" role="form">
       <legend>Payment</legend>
       <div class="form-group">
         <label class="col-sm-3 control-label" for="card-holder-name">Name on Card</label>
         <div class="col-sm-6">
-          <input type="text" class="form-control" name="card-holder-name" id="card-holder-name" placeholder="Card Holder's Name">
+          <input type="text" required class="form-control" name="card-holder-name" id="card-holder-name" placeholder="Card Holder's Name">
         </div>
       </div>
       <div class="form-group">
         <label class="col-sm-3 control-label" for="cardNumber">Card Number</label>
         <div class="col-sm-6">
-	    	<input name="cardNumber" class="form-control" ng-model="vm.card.number" placeholder="Card Number" payments-format="card" payments-validate="card" />
+	    	<input name="cardNumber" required class="form-control" ng-model="vm.card.number" placeholder="Card Number" payments-format="card" type="text" size="20" />
         </div>
       </div>
       <div class="form-group">
         <label class="col-sm-3 control-label" for="cardExpiration">Expiration Date</label>
         <div class="col-sm-3">
-          	<input type="hidden" name="cardExpMonth" value="" data-stripe="exp_month">
-  			<input type="hidden" name="cardExpYear" value=""data-stripe="exp_year">
-	    	<input name="cardExpiration" class="form-control" ng-model="vm.card.expiry" placeholder="Expiration" payments-format="expiry" payments-validate="expiry" />
+	    	<input name="cardExpiration" required class="form-control" ng-model="vm.card.expiry" placeholder="Expiration" payments-format="expiry" payments-validate="expiry" />
         </div>
       </div>
       <div class="form-group">
         <label class="col-sm-3 control-label" for="cardCvv">Card CVV</label>
         <div class="col-sm-3">
-	    	<input name="cardCvc" class="form-control" ng-model="vm.card.cvc" placeholder="CVC" payments-format="cvc" payments-validate="cvc" />
+	    	<input name="cardCvc" required class="form-control" ng-model="vm.card.cvc" placeholder="CVC" payments-format="cvc" payments-validate="cvc" />
         </div>
       </div>
       <div class="form-group">
         <div class="col-sm-offset-3 col-sm-6">
-	    	<button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-credit-card"></span> Submit</button>
+	    	<button type="submit" class="btn btn-success btn-block" ng-click="vm.getToken()"><span class="glyphicon glyphicon-credit-card"></span> Submit</button>
         </div>
       </div>
   </form>

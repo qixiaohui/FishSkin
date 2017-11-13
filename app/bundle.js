@@ -47969,17 +47969,34 @@
 	                    cvc: null
 	                };
 	
-	                vm.stripeCallback = function (code, result) {
-	                    if (result.error) {
-	                        window.alert("failed" + result.error.message);
-	                    } else {
-	                        $http.post('/charge', result).success(function (data, status, headers, config) {
-	                            alert(data);
-	                        }).error(function (data, status, headers, config) {
-	                            alert(data);
-	                        });
-	                    }
+	                vm.getToken = function () {
+	                    debugger;
+	                    Stripe.card.createToken({
+	                        number: vm.card.number,
+	                        exp_month: vm.card.expiry.split("/")[0],
+	                        exp_year: vm.card.expiry.split("/")[1],
+	                        cvc: vm.card.cvc
+	                    }, function (status, response) {
+	                        if (status == 200) {
+	                            alert(response.card.id);
+	                        } else {
+	                            alert(response.error.message);
+	                        }
+	                    });
 	                };
+	
+	                //        vm.stripeCallback = (code, result) => {
+	                //        	if (result.error) {
+	                //        		window.alert("failed" + result.error.message);
+	                //        	} else {
+	                // $http.post('/charge', result)
+	                // .success(function(data, status, headers, config) {
+	                //   alert(data);
+	                // }).error(function(data, status, headers, config) {
+	                //   alert(data);
+	                // });
+	                //        	}
+	                //        }
 	            }
 	        };
 	    });
@@ -48043,7 +48060,7 @@
   \********************************/
 /***/ (function(module, exports) {
 
-	module.exports = "<div class=\"container\">\n  <form class=\"form-horizontal\" stripe-form=\"vm.stripeCallback\" role=\"form\">\n      <legend>Payment</legend>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"card-holder-name\">Name on Card</label>\n        <div class=\"col-sm-6\">\n          <input type=\"text\" class=\"form-control\" name=\"card-holder-name\" id=\"card-holder-name\" placeholder=\"Card Holder's Name\">\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardNumber\">Card Number</label>\n        <div class=\"col-sm-6\">\n\t    \t<input name=\"cardNumber\" class=\"form-control\" ng-model=\"vm.card.number\" placeholder=\"Card Number\" payments-format=\"card\" payments-validate=\"card\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardExpiration\">Expiration Date</label>\n        <div class=\"col-sm-3\">\n          \t<input type=\"hidden\" name=\"cardExpMonth\" value=\"\" data-stripe=\"exp_month\">\n  \t\t\t<input type=\"hidden\" name=\"cardExpYear\" value=\"\"data-stripe=\"exp_year\">\n\t    \t<input name=\"cardExpiration\" class=\"form-control\" ng-model=\"vm.card.expiry\" placeholder=\"Expiration\" payments-format=\"expiry\" payments-validate=\"expiry\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardCvv\">Card CVV</label>\n        <div class=\"col-sm-3\">\n\t    \t<input name=\"cardCvc\" class=\"form-control\" ng-model=\"vm.card.cvc\" placeholder=\"CVC\" payments-format=\"cvc\" payments-validate=\"cvc\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <div class=\"col-sm-offset-3 col-sm-6\">\n\t    \t<button type=\"submit\" class=\"btn btn-success btn-block\"><span class=\"glyphicon glyphicon-credit-card\"></span> Submit</button>\n        </div>\n      </div>\n  </form>\n\t<div ng-if=\"checkoutForm.cardNumber.$invalid\">\n    \tError: invalid card number!\n\t</div>\n</div>"
+	module.exports = "<div class=\"container\">\n  <form class=\"form-horizontal\" role=\"form\">\n      <legend>Payment</legend>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"card-holder-name\">Name on Card</label>\n        <div class=\"col-sm-6\">\n          <input type=\"text\" required class=\"form-control\" name=\"card-holder-name\" id=\"card-holder-name\" placeholder=\"Card Holder's Name\">\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardNumber\">Card Number</label>\n        <div class=\"col-sm-6\">\n\t    \t<input name=\"cardNumber\" required class=\"form-control\" ng-model=\"vm.card.number\" placeholder=\"Card Number\" payments-format=\"card\" type=\"text\" size=\"20\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardExpiration\">Expiration Date</label>\n        <div class=\"col-sm-3\">\n\t    \t<input name=\"cardExpiration\" required class=\"form-control\" ng-model=\"vm.card.expiry\" placeholder=\"Expiration\" payments-format=\"expiry\" payments-validate=\"expiry\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardCvv\">Card CVV</label>\n        <div class=\"col-sm-3\">\n\t    \t<input name=\"cardCvc\" required class=\"form-control\" ng-model=\"vm.card.cvc\" placeholder=\"CVC\" payments-format=\"cvc\" payments-validate=\"cvc\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <div class=\"col-sm-offset-3 col-sm-6\">\n\t    \t<button type=\"submit\" class=\"btn btn-success btn-block\" ng-click=\"vm.getToken()\"><span class=\"glyphicon glyphicon-credit-card\"></span> Submit</button>\n        </div>\n      </div>\n  </form>\n\t<div ng-if=\"checkoutForm.cardNumber.$invalid\">\n    \tError: invalid card number!\n\t</div>\n</div>"
 
 /***/ }),
 /* 65 */
@@ -48308,16 +48325,14 @@
 		ngModule.directive("limitToMax", function () {
 			return {
 				link: function link(scope, element, attributes) {
-					var oldVal = null;
+					// https://codepen.io/Jaydo/pen/yOMZJd
 					element.on("keydown keyup", function (e) {
 						if (Number(element.val()) > Number(attributes.max) && e.keyCode != 46 // delete
 						&& e.keyCode != 8 // backspace
 						) {
 								e.preventDefault();
-								element.val(oldVal);
-							} else {
-							oldVal = Number(element.val());
-						}
+								element.val(attributes.max);
+							}
 					});
 				}
 			};
