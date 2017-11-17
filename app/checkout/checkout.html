@@ -1,6 +1,23 @@
 <div class="container">
+  <form class="form-horizontal" role="form" ng-if="vm.cards.length > 0" style="margin-bottom: 50px">
+	  <legend>Payment</legend>
+	  <div class="row" ng-repeat="card in vm.cards">
+		  <div class='col-xs-4'>
+		    <label class='control-label'>Card Number: last 4 number {{card.lastFour}}</label>
+		  </div>
+		  <div class='col-xs-4'>
+			<label class='control-label'>Expiration: {{card.expiry}}</label>
+		  </div>
+		  <div class='col-xs-2'>
+		    <button class='btn btn-primary' type='submit'>Use this card »</button>
+		  </div>
+		  <div class='col-xs-2'>
+		    <button class='btn btn-info' type='submit' ng-click="vm.removeCard(card.cardId)">Delete this card</button>
+		  </div>
+	  </div>
+  </form>
   <form class="form-horizontal" role="form">
-      <legend>Payment</legend>
+      <legend>Add Card</legend>
       <div class="form-group">
         <label class="col-sm-3 control-label" for="card-holder-name">Name on Card</label>
         <div class="col-sm-6">
@@ -30,8 +47,8 @@
 	    	<button type="submit" class="btn btn-success btn-block" ng-click="vm.getToken()"><span class="glyphicon glyphicon-credit-card"></span> Submit</button>
         </div>
       </div>
-  </form>
-	<div ng-if="checkoutForm.cardNumber.$invalid">
+  	  <div ng-if="checkoutForm.cardNumber.$invalid">
     	Error: invalid card number!
-	</div>
+	  </div>
+  </form>
 </div>

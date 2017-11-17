@@ -15,7 +15,10 @@ export default (ngModule) => {
                 // In case user is not logged in redirect to login page
                 location.redirect();
 
+
                 vm.products = dataprovider.getProduct();
+
+                location.shouldRedirectHome(vm.products);
 
                 // declare functions needed
                 vm.checkout = () => {
@@ -23,18 +26,10 @@ export default (ngModule) => {
                 }
 
                 //********** declare functions needed **********
-                vm.redirectHome = () => {
-                    if (!vm.products || (vm.products instanceof Array && vm.products.length == 0)) {
-                        $location.path("/main/home");
-                    }
-                }
-
-                vm.redirectHome();
-
                 vm.removeFromCart = (product) => {
                     vm.products = dataprovider.removeProduct(product);
                     // Check if current cart is empty, if so redirect to home page
-                    vm.redirectHome();
+                    location.shouldRedirectHome();
                 }
 
                 vm.getTotal = () => {

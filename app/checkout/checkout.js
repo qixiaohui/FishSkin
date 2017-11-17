@@ -18,11 +18,30 @@ export default (ngModule) => {
                 // In case user is not logged in redirect to login page
                 location.redirect();
 
+                location.shouldRedirectHome(dataprovider.getProduct());
+                vm.cards = [];
                 vm.card = {
                 	number: null,
                 	expiry: null,
                 	cvc: null
                 };
+
+                vm.getCard = () => {
+                	var header = {email: dataprovider.getEmail()};
+                	service.get(`${config.BASE_URL}${config.GET_CARD}`, header).then((response) => {
+                		if (response 
+                			&& response.data 
+                			&& response.data instanceof Array 
+                			&& response.data.length > 0) {
+                			vm.cards = response.data;
+                			$scope.$apply();
+                		} 
+                	}).catch((error) => {
+                		console.error(error.message);
+                	});
+                };
+
+                vm.getCard();
 
                 vm.getToken = () => {
                 	Stripe.card.createToken({
@@ -38,10 +57,23 @@ export default (ngModule) => {
                 				amount: 100,
                 				currency: "usd",
                 				token: response.id,
-                				description: ""
+                				description: "",
+                				email: dataprovider.getEmail()
                 			};
+
+                			var saveCardBody = {
+                				token: response.id,
+                				cardId: response.card.id,
+                				brand: response.card.brand,
+                				expiry: response.card.exp_month + "/" + response.card.exp_year,
+                				lastFour: response.card.last4,
+                				holderEmail: dataprovider.getEmail()
+                			};
+
                 			service.post(`${config.BASE_URL}${config.BILLING}`, null, body).then((response) => {
+                				vm.saveCard(saveCardBody);
                 				$location.path("/main/success");
+                				$scope.$apply();
                 			}).catch((error) => {
                 				console.error(error.message);
                 				alert(error.message);
@@ -51,7 +83,29 @@ export default (ngModule) => {
                 			alert(response.error.message);
                 		}
                 	});
-                }
+                };
+
+                vm.saveCard = (body) => {
+                	service.post(`${config.BASE_URL}${config.SAVE_CARD}`, null, body).then((response) => {
+                		console.log(response.data);
+                	}).catch((error) => {
+                		console.error(error.message);
+                		alert(error.message);
+                	});
+                };
+
+                vm.removeCard = (id) => {
+                	var body = {
+                		email: dataprovider.getEmail(),
+                		cardId: id
+                	};
+                	service.post(`${config.BASE_URL}${config.REMOVE_CARD}`, null, body).then((response) => {
+                		vm.cards = response.data;
+                		$scope.$apply();
+                	}).catch((error) => {
+                		console.error(error.message);
+                	});
+                };
 
          //        vm.stripeCallback = (code, result) => {
          //        	if (result.error) {

@@ -47484,7 +47484,10 @@
 		CHECK_ADMIN: "admin/isadmin",
 		CREATE_PRODUCT: "product/create",
 		REMOVE_PRODUCT: "product/remove",
-		BILLING: "stripe/charge"
+		BILLING: "stripe/charge",
+		SAVE_CARD: "stripe/savecard",
+		GET_CARD: "stripe/card",
+		REMOVE_CARD: "stripe/removecard"
 	};
 
 /***/ }),
@@ -47842,24 +47845,18 @@
 	
 	                vm.products = dataprovider.getProduct();
 	
+	                location.shouldRedirectHome(vm.products);
+	
 	                // declare functions needed
 	                vm.checkout = function () {
 	                    $location.path("/main/checkout");
 	                };
 	
 	                //********** declare functions needed **********
-	                vm.redirectHome = function () {
-	                    if (!vm.products || vm.products instanceof Array && vm.products.length == 0) {
-	                        $location.path("/main/home");
-	                    }
-	                };
-	
-	                vm.redirectHome();
-	
 	                vm.removeFromCart = function (product) {
 	                    vm.products = dataprovider.removeProduct(product);
 	                    // Check if current cart is empty, if so redirect to home page
-	                    vm.redirectHome();
+	                    location.shouldRedirectHome();
 	                };
 	
 	                vm.getTotal = function () {
@@ -47965,11 +47962,27 @@
 	                // In case user is not logged in redirect to login page
 	                location.redirect();
 	
+	                location.shouldRedirectHome(dataprovider.getProduct());
+	                vm.cards = [];
 	                vm.card = {
 	                    number: null,
 	                    expiry: null,
 	                    cvc: null
 	                };
+	
+	                vm.getCard = function () {
+	                    var header = { email: dataprovider.getEmail() };
+	                    service.get("" + config.BASE_URL + config.GET_CARD, header).then(function (response) {
+	                        if (response && response.data && response.data instanceof Array && response.data.length > 0) {
+	                            vm.cards = response.data;
+	                            $scope.$apply();
+	                        }
+	                    }).catch(function (error) {
+	                        console.error(error.message);
+	                    });
+	                };
+	
+	                vm.getCard();
 	
 	                vm.getToken = function () {
 	                    Stripe.card.createToken({
@@ -47985,10 +47998,23 @@
 	                                amount: 100,
 	                                currency: "usd",
 	                                token: response.id,
-	                                description: ""
+	                                description: "",
+	                                email: dataprovider.getEmail()
 	                            };
+	
+	                            var saveCardBody = {
+	                                token: response.id,
+	                                cardId: response.card.id,
+	                                brand: response.card.brand,
+	                                expiry: response.card.exp_month + "/" + response.card.exp_year,
+	                                lastFour: response.card.last4,
+	                                holderEmail: dataprovider.getEmail()
+	                            };
+	
 	                            service.post("" + config.BASE_URL + config.BILLING, null, body).then(function (response) {
+	                                vm.saveCard(saveCardBody);
 	                                $location.path("/main/success");
+	                                $scope.$apply();
 	                            }).catch(function (error) {
 	                                console.error(error.message);
 	                                alert(error.message);
@@ -47997,6 +48023,28 @@
 	                            console.error(response.error.message);
 	                            alert(response.error.message);
 	                        }
+	                    });
+	                };
+	
+	                vm.saveCard = function (body) {
+	                    service.post("" + config.BASE_URL + config.SAVE_CARD, null, body).then(function (response) {
+	                        console.log(response.data);
+	                    }).catch(function (error) {
+	                        console.error(error.message);
+	                        alert(error.message);
+	                    });
+	                };
+	
+	                vm.removeCard = function (id) {
+	                    var body = {
+	                        email: dataprovider.getEmail(),
+	                        cardId: id
+	                    };
+	                    service.post("" + config.BASE_URL + config.REMOVE_CARD, null, body).then(function (response) {
+	                        vm.cards = response.data;
+	                        $scope.$apply();
+	                    }).catch(function (error) {
+	                        console.error(error.message);
 	                    });
 	                };
 	
@@ -48075,7 +48123,7 @@
   \********************************/
 /***/ (function(module, exports) {
 
-	module.exports = "<div class=\"container\">\n  <form class=\"form-horizontal\" role=\"form\">\n      <legend>Payment</legend>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"card-holder-name\">Name on Card</label>\n        <div class=\"col-sm-6\">\n          <input type=\"text\" required class=\"form-control\" name=\"card-holder-name\" id=\"card-holder-name\" placeholder=\"Card Holder's Name\">\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardNumber\">Card Number</label>\n        <div class=\"col-sm-6\">\n\t    \t<input name=\"cardNumber\" required class=\"form-control\" ng-model=\"vm.card.number\" placeholder=\"Card Number\" payments-format=\"card\" type=\"text\" size=\"20\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardExpiration\">Expiration Date</label>\n        <div class=\"col-sm-3\">\n\t    \t<input name=\"cardExpiration\" required class=\"form-control\" ng-model=\"vm.card.expiry\" placeholder=\"Expiration\" payments-format=\"expiry\" payments-validate=\"expiry\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardCvv\">Card CVV</label>\n        <div class=\"col-sm-3\">\n\t    \t<input name=\"cardCvc\" required class=\"form-control\" ng-model=\"vm.card.cvc\" placeholder=\"CVC\" payments-format=\"cvc\" payments-validate=\"cvc\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <div class=\"col-sm-offset-3 col-sm-6\">\n\t    \t<button type=\"submit\" class=\"btn btn-success btn-block\" ng-click=\"vm.getToken()\"><span class=\"glyphicon glyphicon-credit-card\"></span> Submit</button>\n        </div>\n      </div>\n  </form>\n\t<div ng-if=\"checkoutForm.cardNumber.$invalid\">\n    \tError: invalid card number!\n\t</div>\n</div>"
+	module.exports = "<div class=\"container\">\n  <form class=\"form-horizontal\" role=\"form\" ng-if=\"vm.cards.length > 0\" style=\"margin-bottom: 50px\">\n\t  <legend>Payment</legend>\n\t  <div class=\"row\" ng-repeat=\"card in vm.cards\">\n\t\t  <div class='col-xs-4'>\n\t\t    <label class='control-label'>Card Number: last 4 number {{card.lastFour}}</label>\n\t\t  </div>\n\t\t  <div class='col-xs-4'>\n\t\t\t<label class='control-label'>Expiration: {{card.expiry}}</label>\n\t\t  </div>\n\t\t  <div class='col-xs-2'>\n\t\t    <button class='btn btn-primary' type='submit'>Use this card »</button>\n\t\t  </div>\n\t\t  <div class='col-xs-2'>\n\t\t    <button class='btn btn-info' type='submit'>Delete this card</button>\n\t\t  </div>\n\t  </div>\n  </form>\n  <form class=\"form-horizontal\" role=\"form\">\n      <legend>Add Card</legend>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"card-holder-name\">Name on Card</label>\n        <div class=\"col-sm-6\">\n          <input type=\"text\" required class=\"form-control\" name=\"card-holder-name\" id=\"card-holder-name\" placeholder=\"Card Holder's Name\">\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardNumber\">Card Number</label>\n        <div class=\"col-sm-6\">\n\t    \t<input name=\"cardNumber\" required class=\"form-control\" ng-model=\"vm.card.number\" placeholder=\"Card Number\" payments-format=\"card\" type=\"text\" size=\"20\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardExpiration\">Expiration Date</label>\n        <div class=\"col-sm-3\">\n\t    \t<input name=\"cardExpiration\" required class=\"form-control\" ng-model=\"vm.card.expiry\" placeholder=\"Expiration\" payments-format=\"expiry\" payments-validate=\"expiry\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardCvv\">Card CVV</label>\n        <div class=\"col-sm-3\">\n\t    \t<input name=\"cardCvc\" required class=\"form-control\" ng-model=\"vm.card.cvc\" placeholder=\"CVC\" payments-format=\"cvc\" payments-validate=\"cvc\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <div class=\"col-sm-offset-3 col-sm-6\">\n\t    \t<button type=\"submit\" class=\"btn btn-success btn-block\" ng-click=\"vm.getToken()\"><span class=\"glyphicon glyphicon-credit-card\"></span> Submit</button>\n        </div>\n      </div>\n  \t  <div ng-if=\"checkoutForm.cardNumber.$invalid\">\n    \tError: invalid card number!\n\t  </div>\n  </form>\n</div>"
 
 /***/ }),
 /* 65 */
@@ -48253,6 +48301,17 @@
 	            controller: function controller($rootScope, $location, $scope, $timeout, dataprovider, location) {
 	                var vm = this;
 	
+	                // In case user is not logged in redirect to login page
+	                location.redirect();
+	
+	                location.shouldRedirectHome(dataprovider.getProduct());
+	
+	                dataprovider.clearCart();
+	
+	                var email = dataprovider.getEmail();
+	
+	                vm.username = email.substring(0, email.indexOf('@'));
+	
 	                vm.continueShopping = function () {
 	                    $location.path("/main/home");
 	                };
@@ -48319,7 +48378,7 @@
   \******************************/
 /***/ (function(module, exports) {
 
-	module.exports = "<div class=\"container\">\n\t<div class=\"row text-center\">\n        <div class=\"col-sm-6 col-sm-offset-3\">\n        <br><br> <h2 style=\"color:#0fad00\">Success</h2>\n        <img src=\"http://osmhotels.com//assets/check-true.jpg\">\n        <h3>Dear, Faisal khan</h3>\n        <p style=\"font-size:20px;color:#5C5C5C;\">Thank you for verifying your Mobile No.We have sent you an email \"faisalkhan.chat@gmail.com\" with your details\nPlease go to your above email now and login.</p>\n        <a ng-click=\"vm.continueShopping()\" class=\"btn btn-success\">Continue shopping</a>\n    <br><br>\n        </div>\n        \n\t</div>\n</div>"
+	module.exports = "<div class=\"container\">\n\t<div class=\"row text-center\">\n        <div class=\"col-sm-6 col-sm-offset-3\">\n        <br><br> <h2 style=\"color:#0fad00\">Success</h2>\n        <img src=\"http://osmhotels.com//assets/check-true.jpg\">\n        <h3>Dear, {{vm.username}}</h3>\n        <p style=\"font-size:20px;color:#5C5C5C;\">Thank you for shopping at FishSkin, your purchase is on the way for delivey!</p>\n        <a ng-click=\"vm.continueShopping()\" class=\"btn btn-success\">Continue shopping</a>\n    <br><br>\n        </div>\n        \n\t</div>\n</div>"
 
 /***/ }),
 /* 73 */
@@ -48338,6 +48397,14 @@
 	    ngModule.service("dataprovider", function () {
 	        var data = {};
 	        var cart = [];
+	        var user = null;
+	
+	        var getEmail = function getEmail() {
+	            if (!user) {
+	                user = JSON.parse(localStorage.getItem('USER'));
+	            }
+	            return user.email;
+	        };
 	
 	        var setData = function setData(input) {
 	            data = input;
@@ -48365,6 +48432,10 @@
 	            return cart;
 	        };
 	
+	        var clearCart = function clearCart() {
+	            cart = [];
+	        };
+	
 	        var getProduct = function getProduct() {
 	            return cart;
 	        };
@@ -48380,10 +48451,12 @@
 	        };
 	
 	        return {
+	            getEmail: getEmail,
 	            setData: setData,
 	            getData: getData,
 	            addProduct: addProduct,
 	            removeProduct: removeProduct,
+	            clearCart: clearCart,
 	            getProduct: getProduct,
 	            isProductInCart: isProductInCart
 	        };
@@ -48411,7 +48484,14 @@
 	            }
 	        };
 	
+	        var shouldRedirectHome = function shouldRedirectHome(products) {
+	            if (!products || products instanceof Array && products.length == 0) {
+	                $location.path("/main/home");
+	            }
+	        };
+	
 	        return {
+	            shouldRedirectHome: shouldRedirectHome,
 	            redirect: redirect
 	        };
 	    });

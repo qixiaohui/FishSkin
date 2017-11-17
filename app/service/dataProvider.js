@@ -2,6 +2,14 @@ export default (ngModule) => {
     ngModule.service("dataprovider", () => {
     	var data = {};
     	var cart = [];
+        var user = null;
+
+        var getEmail = () => {
+            if (!user) {
+                user = JSON.parse(localStorage.getItem('USER'));
+            }
+            return user.email;
+        }
 
     	var setData = (input) => {
     		data = input;
@@ -29,6 +37,10 @@ export default (ngModule) => {
     		return cart;
     	}
 
+        var clearCart = () => {
+            cart = [];
+        }
+
     	var getProduct = () => {
     		return cart;
     	}
@@ -44,10 +56,12 @@ export default (ngModule) => {
         }
 
     	return {
+            getEmail,
     		setData,
     		getData,
     		addProduct,
     		removeProduct,
+            clearCart,
     		getProduct,
             isProductInCart
     	}

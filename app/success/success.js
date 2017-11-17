@@ -12,6 +12,17 @@ export default (ngModule) => {
             controller: function($rootScope, $location, $scope, $timeout, dataprovider, location){
                 const vm = this;
 
+                // In case user is not logged in redirect to login page
+                location.redirect();
+
+                location.shouldRedirectHome(dataprovider.getProduct());
+
+                dataprovider.clearCart();
+
+                var email = dataprovider.getEmail();
+
+                vm.username = email.substring(0, email.indexOf('@'));
+
                 vm.continueShopping = () => {
                 	$location.path("/main/home");
                 }
