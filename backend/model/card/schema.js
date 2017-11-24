@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 var CardSchema = new Schema({
-	token: {
+	customerId: {
 		type: String,
 		required: true,
 		unique: true

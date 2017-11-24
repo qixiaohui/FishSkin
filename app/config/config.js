@@ -7,7 +7,7 @@ module.exports = {
 	CREATE_PRODUCT: "product/create",
 	REMOVE_PRODUCT: "product/remove",
 	BILLING: "stripe/charge",
-	SAVE_CARD: "stripe/savecard",
+	CREATE_CUSTOMER_AND_CHARGE: "stripe/createCustomerAndCharge",
 	GET_CARD: "stripe/card",
 	REMOVE_CARD: "stripe/removecard"
 };

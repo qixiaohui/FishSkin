@@ -43,6 +43,26 @@ export default (ngModule) => {
 
                 vm.getCard();
 
+                vm.saveCustomerAndCharge = (card) => {
+            		let body = {
+            			amount: 100,
+            			description: "",
+            			holderEmail: dataprovider.getEmail(),
+            			source: card.id,
+            			cardId: card.card.id,
+            			brand: card.card.brand,
+            			expiry: card.card.exp_month + "/" + card.card.exp_year,
+            			lastFour: card.card.last4
+            		};
+
+                	service.post(`${config.BASE_URL}${config.CREATE_CUSTOMER_AND_CHARGE}`, null, body).then((response) => {
+	    				$location.path("/main/success");
+	    				$scope.$apply();
+                	}).catch((error) => {
+                		console.error(error.message);
+                	});
+                }
+
                 vm.getToken = () => {
                 	Stripe.card.createToken({
                 		number: vm.card.number,
@@ -52,32 +72,9 @@ export default (ngModule) => {
                 	}, (status, response) => {
                 		if (status == 200) {
                 			// After getting the token from stripe
-                			// Call /charge api to charge the 
-                			var body = {
-                				amount: 100,
-                				currency: "usd",
-                				token: response.id,
-                				description: "",
-                				email: dataprovider.getEmail()
-                			};
-
-                			var saveCardBody = {
-                				token: response.id,
-                				cardId: response.card.id,
-                				brand: response.card.brand,
-                				expiry: response.card.exp_month + "/" + response.card.exp_year,
-                				lastFour: response.card.last4,
-                				holderEmail: dataprovider.getEmail()
-                			};
-
-                			service.post(`${config.BASE_URL}${config.BILLING}`, null, body).then((response) => {
-                				vm.saveCard(saveCardBody);
-                				$location.path("/main/success");
-                				$scope.$apply();
-                			}).catch((error) => {
-                				console.error(error.message);
-                				alert(error.message);
-                			});
+                			// Call /createCustomerAndCharge api to 
+                			// Create customer and charge
+                			vm.saveCustomerAndCharge(response);
                 		} else {
                 			console.error(response.error.message);
                 			alert(response.error.message);
@@ -107,18 +104,35 @@ export default (ngModule) => {
                 	});
                 };
 
-         //        vm.stripeCallback = (code, result) => {
-         //        	if (result.error) {
-         //        		window.alert("failed" + result.error.message);
-         //        	} else {
-					    // $http.post('/charge', result)
-					    // .success(function(data, status, headers, config) {
-					    //   alert(data);
-					    // }).error(function(data, status, headers, config) {
-					    //   alert(data);
-					    // });
-         //        	}
-         //        }
+                vm.useThisCard = (card) => {
+                	var body = {
+                		amount: 100,
+                		currency: "usd",
+                		token: card.token,
+                		description: "",
+                		email: card.holderEmail
+                	};
+
+                	vm.makeCardPayment(false/**Save card */, body);
+                };
+
+                vm.makeCardPayment = (card) => {
+        			var body = {
+        				amount: 100,
+        				currency: "usd",
+        				description: "",
+        				cardId: card.cardId,
+        				email: dataprovider.getEmail()
+        			};
+
+	    			service.post(`${config.BASE_URL}${config.BILLING}`, null, body).then((response) => {
+	    				$location.path("/main/success");
+	    				$scope.$apply();
+	    			}).catch((error) => {
+	    				console.error(error.message);
+	    				alert(error.message);
+	    			});
+                }
             }
         }
     });

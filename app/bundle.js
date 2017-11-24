@@ -47485,7 +47485,7 @@
 		CREATE_PRODUCT: "product/create",
 		REMOVE_PRODUCT: "product/remove",
 		BILLING: "stripe/charge",
-		SAVE_CARD: "stripe/savecard",
+		CREATE_CUSTOMER_AND_CHARGE: "stripe/createCustomerAndCharge",
 		GET_CARD: "stripe/card",
 		REMOVE_CARD: "stripe/removecard"
 	};
@@ -47984,6 +47984,26 @@
 	
 	                vm.getCard();
 	
+	                vm.saveCustomerAndCharge = function (card) {
+	                    var body = {
+	                        amount: 100,
+	                        description: "",
+	                        holderEmail: dataprovider.getEmail(),
+	                        source: card.id,
+	                        cardId: card.card.id,
+	                        brand: card.card.brand,
+	                        expiry: card.card.exp_month + "/" + card.card.exp_year,
+	                        lastFour: card.card.last4
+	                    };
+	
+	                    service.post("" + config.BASE_URL + config.CREATE_CUSTOMER_AND_CHARGE, null, body).then(function (response) {
+	                        $location.path("/main/success");
+	                        $scope.$apply();
+	                    }).catch(function (error) {
+	                        console.error(error.message);
+	                    });
+	                };
+	
 	                vm.getToken = function () {
 	                    Stripe.card.createToken({
 	                        number: vm.card.number,
@@ -47993,32 +48013,9 @@
 	                    }, function (status, response) {
 	                        if (status == 200) {
 	                            // After getting the token from stripe
-	                            // Call /charge api to charge the 
-	                            var body = {
-	                                amount: 100,
-	                                currency: "usd",
-	                                token: response.id,
-	                                description: "",
-	                                email: dataprovider.getEmail()
-	                            };
-	
-	                            var saveCardBody = {
-	                                token: response.id,
-	                                cardId: response.card.id,
-	                                brand: response.card.brand,
-	                                expiry: response.card.exp_month + "/" + response.card.exp_year,
-	                                lastFour: response.card.last4,
-	                                holderEmail: dataprovider.getEmail()
-	                            };
-	
-	                            service.post("" + config.BASE_URL + config.BILLING, null, body).then(function (response) {
-	                                vm.saveCard(saveCardBody);
-	                                $location.path("/main/success");
-	                                $scope.$apply();
-	                            }).catch(function (error) {
-	                                console.error(error.message);
-	                                alert(error.message);
-	                            });
+	                            // Call /createCustomerAndCharge api to 
+	                            // Create customer and charge
+	                            vm.saveCustomerAndCharge(response);
 	                        } else {
 	                            console.error(response.error.message);
 	                            alert(response.error.message);
@@ -48048,18 +48045,35 @@
 	                    });
 	                };
 	
-	                //        vm.stripeCallback = (code, result) => {
-	                //        	if (result.error) {
-	                //        		window.alert("failed" + result.error.message);
-	                //        	} else {
-	                // $http.post('/charge', result)
-	                // .success(function(data, status, headers, config) {
-	                //   alert(data);
-	                // }).error(function(data, status, headers, config) {
-	                //   alert(data);
-	                // });
-	                //        	}
-	                //        }
+	                vm.useThisCard = function (card) {
+	                    var body = {
+	                        amount: 100,
+	                        currency: "usd",
+	                        token: card.token,
+	                        description: "",
+	                        email: card.holderEmail
+	                    };
+	
+	                    vm.makeCardPayment(false /**Save card */, body);
+	                };
+	
+	                vm.makeCardPayment = function (card) {
+	                    var body = {
+	                        amount: 100,
+	                        currency: "usd",
+	                        description: "",
+	                        cardId: card.cardId,
+	                        email: dataprovider.getEmail()
+	                    };
+	
+	                    service.post("" + config.BASE_URL + config.BILLING, null, body).then(function (response) {
+	                        $location.path("/main/success");
+	                        $scope.$apply();
+	                    }).catch(function (error) {
+	                        console.error(error.message);
+	                        alert(error.message);
+	                    });
+	                };
 	            }
 	        };
 	    });
@@ -48123,7 +48137,7 @@
   \********************************/
 /***/ (function(module, exports) {
 
-	module.exports = "<div class=\"container\">\n  <form class=\"form-horizontal\" role=\"form\" ng-if=\"vm.cards.length > 0\" style=\"margin-bottom: 50px\">\n\t  <legend>Payment</legend>\n\t  <div class=\"row\" ng-repeat=\"card in vm.cards\">\n\t\t  <div class='col-xs-4'>\n\t\t    <label class='control-label'>Card Number: last 4 number {{card.lastFour}}</label>\n\t\t  </div>\n\t\t  <div class='col-xs-4'>\n\t\t\t<label class='control-label'>Expiration: {{card.expiry}}</label>\n\t\t  </div>\n\t\t  <div class='col-xs-2'>\n\t\t    <button class='btn btn-primary' type='submit'>Use this card »</button>\n\t\t  </div>\n\t\t  <div class='col-xs-2'>\n\t\t    <button class='btn btn-info' type='submit'>Delete this card</button>\n\t\t  </div>\n\t  </div>\n  </form>\n  <form class=\"form-horizontal\" role=\"form\">\n      <legend>Add Card</legend>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"card-holder-name\">Name on Card</label>\n        <div class=\"col-sm-6\">\n          <input type=\"text\" required class=\"form-control\" name=\"card-holder-name\" id=\"card-holder-name\" placeholder=\"Card Holder's Name\">\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardNumber\">Card Number</label>\n        <div class=\"col-sm-6\">\n\t    \t<input name=\"cardNumber\" required class=\"form-control\" ng-model=\"vm.card.number\" placeholder=\"Card Number\" payments-format=\"card\" type=\"text\" size=\"20\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardExpiration\">Expiration Date</label>\n        <div class=\"col-sm-3\">\n\t    \t<input name=\"cardExpiration\" required class=\"form-control\" ng-model=\"vm.card.expiry\" placeholder=\"Expiration\" payments-format=\"expiry\" payments-validate=\"expiry\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardCvv\">Card CVV</label>\n        <div class=\"col-sm-3\">\n\t    \t<input name=\"cardCvc\" required class=\"form-control\" ng-model=\"vm.card.cvc\" placeholder=\"CVC\" payments-format=\"cvc\" payments-validate=\"cvc\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <div class=\"col-sm-offset-3 col-sm-6\">\n\t    \t<button type=\"submit\" class=\"btn btn-success btn-block\" ng-click=\"vm.getToken()\"><span class=\"glyphicon glyphicon-credit-card\"></span> Submit</button>\n        </div>\n      </div>\n  \t  <div ng-if=\"checkoutForm.cardNumber.$invalid\">\n    \tError: invalid card number!\n\t  </div>\n  </form>\n</div>"
+	module.exports = "<div class=\"container\">\n  <form class=\"form-horizontal\" role=\"form\" ng-if=\"vm.cards.length > 0\" style=\"margin-bottom: 50px\">\n\t  <legend>Payment</legend>\n\t  <div class=\"row\" ng-repeat=\"card in vm.cards\">\n\t\t  <div class='col-xs-4'>\n\t\t    <label class='control-label'>Card Number: last 4 number {{card.lastFour}}</label>\n\t\t  </div>\n\t\t  <div class='col-xs-4'>\n\t\t\t<label class='control-label'>Expiration: {{card.expiry}}</label>\n\t\t  </div>\n\t\t  <div class='col-xs-2'>\n\t\t    <button class='btn btn-primary' type='submit' ng-click=\"vm.makeCardPayment(card)\">Use this card »</button>\n\t\t  </div>\n\t\t  <div class='col-xs-2'>\n\t\t    <button class='btn btn-info' type='submit' ng-click=\"vm.removeCard(card.cardId)\">Delete this card</button>\n\t\t  </div>\n\t  </div>\n  </form>\n  <form class=\"form-horizontal\" role=\"form\">\n      <legend>Add Card</legend>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"card-holder-name\">Name on Card</label>\n        <div class=\"col-sm-6\">\n          <input type=\"text\" required class=\"form-control\" name=\"card-holder-name\" id=\"card-holder-name\" placeholder=\"Card Holder's Name\">\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardNumber\">Card Number</label>\n        <div class=\"col-sm-6\">\n\t    \t<input name=\"cardNumber\" required class=\"form-control\" ng-model=\"vm.card.number\" placeholder=\"Card Number\" payments-format=\"card\" type=\"text\" size=\"20\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardExpiration\">Expiration Date</label>\n        <div class=\"col-sm-3\">\n\t    \t<input name=\"cardExpiration\" required class=\"form-control\" ng-model=\"vm.card.expiry\" placeholder=\"Expiration\" payments-format=\"expiry\" payments-validate=\"expiry\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label class=\"col-sm-3 control-label\" for=\"cardCvv\">Card CVV</label>\n        <div class=\"col-sm-3\">\n\t    \t<input name=\"cardCvc\" required class=\"form-control\" ng-model=\"vm.card.cvc\" placeholder=\"CVC\" payments-format=\"cvc\" payments-validate=\"cvc\" />\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <div class=\"col-sm-offset-3 col-sm-6\">\n\t    \t<button type=\"submit\" class=\"btn btn-success btn-block\" ng-click=\"vm.getToken()\"><span class=\"glyphicon glyphicon-credit-card\"></span> Submit</button>\n        </div>\n      </div>\n  \t  <div ng-if=\"checkoutForm.cardNumber.$invalid\">\n    \tError: invalid card number!\n\t  </div>\n  </form>\n</div>"
 
 /***/ }),
 /* 65 */

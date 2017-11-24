@@ -11,54 +11,75 @@ const stripe = require("stripe")(secretKey);
 
 module.exports = (passport) => {
 	router.post("/charge", passport.authenticate('jwt', { session: false }), (request, response) => {
+		Card.findOne({cardId: request.body.cardId}, (error, card) => {
+			stripe.charges.create({
+				amount: request.body.amount,
+				currency: "usd",
+				customer: card.customerId,
+				description: request.body.productId,
+				receipt_email: request.body.email
+			}, (error, charge) => {
+				if (error) {
+					console.error(error.message);
+					response.status(400).send({
+						message: error.message
+					});
+					return;
+				}
 
-		let charge = stripe.charges.create({
-			amount: request.body.amount,
-			currency: "usd",
-			source: request.body.token,
-			description: request.body.productId,
-			receipt_email: request.body.email
-		}, (error, charge) => {
-			if (error) {
-				console.error(error.message);
-				response.status(400).send({
-					message: error.message
-				});
-				return;
-			}
-
-			response.status(200).send(charge);
+				response.status(200).send(charge);
+			});
 		});
 	});
 
-	router.post("/saveCard", passport.authenticate('jwt', { session: false }), (request, response) => {
-		// TODO: remove this once client side implemnet address
-		request.body.address = request.body.address? request.body.address : "default";
-		request.body.city = request.body.city? request.body.city : "default";
-		request.body.zip = request.body.zip? request.body.zip : 0;
-		request.body.state = request.body.state? request.body.state : "default";
-
-		var card = new Card({
-			token: request.body.token,
-			cardId: request.body.cardId,
-			address: request.body.address,
-			city: request.body.city,
-			zip: request.body.zip,
-			state: request.body.state,
-			brand: request.body.brand,
-			expiry: request.body.expiry,
-			lastFour: request.body.lastFour,
-			holderEmail: request.body.holderEmail
-		});
-
-		card.save((error) => {
-			if (error) {
-				return response.send({status: 400, message: error.message});
-			}
-			return response.status(200).send({
-				success: true
+	router.post("/createCustomerAndCharge", passport.authenticate('jwt', { session: false }), (request, response) => {
+		var customer;
+		stripe.customers.create({
+			email: request.body.holderEmail,
+			source: request.body.source
+		}).then((customer) => {
+			this.customer = customer;
+			return stripe.charges.create({
+				amount: request.body.amount,
+				currency: "usd",
+				customer: customer.id,
+				description: request.body.description,
+				receipt_email: request.body.holderEmail
 			});
+		}).then((charge) => {
+			// TODO: remove this once client side implemnet address
+			request.body.address = request.body.address? request.body.address : "default";
+			request.body.city = request.body.city? request.body.city : "default";
+			request.body.zip = request.body.zip? request.body.zip : 0;
+			request.body.state = request.body.state? request.body.state : "default";
+
+
+			var card = new Card({
+				customerId: this.customer.id,
+				cardId: request.body.cardId,
+				address: request.body.address,
+				city: request.body.city,
+				zip: request.body.zip,
+				state: request.body.state,
+				brand: request.body.brand,
+				expiry: request.body.expiry,
+				lastFour: request.body.lastFour,
+				holderEmail: request.body.holderEmail
+			});
+
+			card.save((error) => {
+				//TODO: add handle of this
+				if (error) {
+					console.log(error.message);
+				}
+			});
+
+			response.status(200).send(charge);
+
+		}).catch((error) => {
+			response.status(400).send(error.message);
 		});
+
 	});
 
 	router.get("/card", passport.authenticate('jwt', { session: false }), (request, response) => {
@@ -68,7 +89,10 @@ module.exports = (passport) => {
 		}
 
 		Card.find({holderEmail: request.headers.email}, (error, cards) => {
-			if (error || !cards || cards instanceof Array && cards.length == 0) response.status(401).send({status: 400, message: "No card found"});
+			if (error || !cards || cards instanceof Array && cards.length == 0) {
+				response.status(401).send({status: 400, message: "No card found"});
+				return;
+			}
 
 			return response.status(200).send(cards);
 		});

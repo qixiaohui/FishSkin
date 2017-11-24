@@ -9,7 +9,7 @@
 			<label class='control-label'>Expiration: {{card.expiry}}</label>
 		  </div>
 		  <div class='col-xs-2'>
-		    <button class='btn btn-primary' type='submit'>Use this card »</button>
+		    <button class='btn btn-primary' type='submit' ng-click="vm.makeCardPayment(card)">Use this card »</button>
 		  </div>
 		  <div class='col-xs-2'>
 		    <button class='btn btn-info' type='submit' ng-click="vm.removeCard(card.cardId)">Delete this card</button>
